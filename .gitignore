@@ -216,3 +216,49 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# ==============================
+# LaTeX auxiliary files
+# ==============================
+
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# ==============================
+# Bibliography
+# ==============================
+
+*.bcf
+*.run.xml
+*.bbl
+*.blg
+
+# ==============================
+# Other LaTeX generated files
+# ==============================
+
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.xdv
+
+# ==============================
+# Build output (if using a folder)
+# ==============================
+
+output/
+build/
+
+# ==============================
+# VS Code
+# ==============================
+
+.vscode/
