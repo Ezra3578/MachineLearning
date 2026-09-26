@@ -268,3 +268,4 @@ build/
 # ==============================
 
 Workshop_1_guide.md
+*.joblib

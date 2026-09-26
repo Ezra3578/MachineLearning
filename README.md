@@ -1,19 +1,25 @@
-# Machine Learning
-This repository contains the information and retrievals of the workshops from the Machine Learning class. 
+# Aprendizaje Automático (Machine Learning)
 
-## Members
-- Jhojan - 
-- Santiago - 
+Repositorio que reúne los talleres prácticos, código y documentación desarrollados durante el curso de Aprendizaje Automático en la Universidad Distrital Francisco José de Caldas.
+
+## Integrantes
+- Jhojan
+- Santiago Reyes Gómez - 20221020098
 - Juan Andrés Jiménez Palomino - 20221020087
 
-## Problem Domain
-The domain where this implementations of AI solutions revolves around is Computer Vision oriented to Image Classification.
+## Dominio del Problema
+Los desarrollos del curso se concentran en tareas de **Visión por Computador (Computer Vision)** orientadas a la clasificación de imágenes. A lo largo del semestre se abordan distintas metodologías y paradigmas de modelado, organizados de forma modular por taller.
 
-Across the different workshops, there will be different approaches to solve such problems, each folder of the repository contains the necessary information to fully understand the requirements, the approach of the solution and its corresponding conclussion analysis.
+---
 
-### Workshop 1: Supervised Learning
-In this workshop, the main focus will be to fully understand the selected dataset of Image Classification, in this case, the Fashion-MNIST problem.
+## Estructura de Talleres
 
-The project focuses on implementing supervised learning algorithms used for classification such as Random Forest, XGBoost and even K-Means to compare how the perfomance of each algorithm varies, giving the corresponding analysis to the result.
-
-The main metric to evaluate its performance, will be the F-Score, focusing on the precission compares the True Positives over all the Positives classified. The False Positives are more relevant to avoid selecting and classifying the data wrong.
+### [Taller 1: Preparación de Datos y Modelos Base de Aprendizaje Supervisado](Workshop_1/README.md)
+- **Dominio:** Clasificación de imágenes sobre el conjunto de datos Fashion-MNIST (10 clases, 70,000 muestras monocromáticas de 28x28 píxeles).
+- **Alcance:**
+  - Descarga y verificación de integridad criptográfica (hashes MD5 y SHA-256).
+  - Análisis Exploratorio de Datos (EDA): estadísticas de intensidad lumínica, balance de clases (*Imbalance Ratio* = 1.0), imágenes promedio y proyecciones 2D con PCA.
+  - Pipeline de preprocesamiento: partición estratificada reproducible (70% train / 15% val / 15% test en `data/splits.json`), estandarización z-score (`StandardScaler`), aumento de datos en entrenamiento (volteo horizontal y traslación) y reducción de dimensionalidad con PCA (95% varianza acumulada).
+  - Modelos base supervisados: Regresión Logística, Random Forest e HistGradientBoosting.
+  - Evaluación integral: Exactitud, Macro F1, Matrices de confusión normalizadas y análisis de error sistemático en prendas superiores (*Shirt*, *T-shirt*, *Pullover*, *Coat*).
+- **Documentación completa y reproducción:** Consulte [Workshop_1/README.md](Workshop_1/README.md).
