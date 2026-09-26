@@ -262,3 +262,13 @@ build/
 # ==============================
 
 .vscode/
+
+# ==============================
+# Workshop 2 - data and run artifacts
+# (checkpoints are tracked: required deliverable)
+# ==============================
+
+Workshop_2/data/*
+!Workshop_2/data/dataset_stats.json
+Workshop_2/runs/*
+!Workshop_2/runs/.gitkeep
