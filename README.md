@@ -1,25 +1,27 @@
-# Aprendizaje Automático (Machine Learning)
+# Machine Learning
 
-Repositorio que reúne los talleres prácticos, código y documentación desarrollados durante el curso de Aprendizaje Automático en la Universidad Distrital Francisco José de Caldas.
+This repository contains the information and retrievals of the workshops from the Machine Learning class.
 
-## Integrantes
-- Jhojan
+## Team Members
+- Jhojan Stiven Aragón Ramírez - 20221020060
 - Santiago Reyes Gómez - 20221020098
 - Juan Andrés Jiménez Palomino - 20221020087
 
-## Dominio del Problema
-Los desarrollos del curso se concentran en tareas de **Visión por Computador (Computer Vision)** orientadas a la clasificación de imágenes. A lo largo del semestre se abordan distintas metodologías y paradigmas de modelado, organizados de forma modular por taller.
+## Problem's Domain
+The domain where this implementations of AI solutions revolves around is Computer Vision oriented to Image Classification.
+
+Across the different workshops, there will be different approaches to solve such problems, each folder of the repository contains the necessary information to fully understand the requirements, the approach of the solution and its corresponding conclussion analysis.
 
 ---
 
-## Estructura de Talleres
+## Workshops Structure
 
-### [Taller 1: Preparación de Datos y Modelos Base de Aprendizaje Supervisado](Workshop_1/README.md)
-- **Dominio:** Clasificación de imágenes sobre el conjunto de datos Fashion-MNIST (10 clases, 70,000 muestras monocromáticas de 28x28 píxeles).
-- **Alcance:**
-  - Descarga y verificación de integridad criptográfica (hashes MD5 y SHA-256).
-  - Análisis Exploratorio de Datos (EDA): estadísticas de intensidad lumínica, balance de clases (*Imbalance Ratio* = 1.0), imágenes promedio y proyecciones 2D con PCA.
-  - Pipeline de preprocesamiento: partición estratificada reproducible (70% train / 15% val / 15% test en `data/splits.json`), estandarización z-score (`StandardScaler`), aumento de datos en entrenamiento (volteo horizontal y traslación) y reducción de dimensionalidad con PCA (95% varianza acumulada).
-  - Modelos base supervisados: Regresión Logística, Random Forest e HistGradientBoosting.
-  - Evaluación integral: Exactitud, Macro F1, Matrices de confusión normalizadas y análisis de error sistemático en prendas superiores (*Shirt*, *T-shirt*, *Pullover*, *Coat*).
-- **Documentación completa y reproducción:** Consulte [Workshop_1/README.md](Workshop_1/README.md).
+### [Workshop 1: Data Preparation & Supervised Learning Base Models](Workshop_1/README.md)
+- **Domain:** Image classification to the dataset of Fashion-MNIST. This dataset is composed of 10 classes, with 70000 monocromatic images of 28x28 pixels.
+- **Reach:**
+  - Download and verification of cryptographic integrity (hashes MD5 and SHA-256).
+  - Exploratory Data Analysis (EDA): Luminic intensity stats, class balance (*Imbalance Ratio* = 1.0), avg images and 2D projections using PCA.
+  - Processing Pipeline: Reproducible stratified partition (70% train / 15% val / 15% test en `data/splits.json`), z-score standarization (`StandardScaler`), augmented data in training (horizontal flip and traslation) and dimensionality reduction using PCA (95% cumulative variance).
+  - Supervised Learning Base Models: Multiclass Logistic Regression, Random Forest & HistGradientBoosting.
+  - Performance Evaluation: Accuracy, Precision, F1-Score & One vs. All Confusion Matrixes. To evaluate general performance and per class.
+- **To seek complete reproductibility:** Go to [Workshop_1/README.md](Workshop_1/README.md).

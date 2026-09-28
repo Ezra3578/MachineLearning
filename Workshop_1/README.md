@@ -1,161 +1,134 @@
-# Taller 1: Preparación de Datos y Modelos Base de Aprendizaje Supervisado
+# Workshop 1: Data Preparation & Supervised Learning Base Models
 
-Repositorio para el primer taller práctico del curso de Aprendizaje Automático (Semestre 2026-III), Universidad Distrital Francisco José de Caldas.
+## 1. Dataset Description (Fashion-MNIST)
 
-## Integrantes
-- Jhojan
-- Santiago Reyes Gómez - 20221020098
-- Juan Andrés Jiménez Palomino - 20221020087
+Fashion-MNIST is a dataset devolped by Zalando Research composed of 70,000 monocromatic images in a integer format of 8 bits (`uint8`), with a uniform resolution of 28x28 pixels (784 variables per sample). The dataset is divided in 10 categories of clothing products. It is originally distributed with 60,000 samples for training and 10,000 samples for testing.
 
----
-
-## 1. Descripción del Conjunto de Datos (Fashion-MNIST)
-
-Fashion-MNIST es un conjunto de datos desarrollado por Zalando Research compuesto por 70,000 imágenes monocromáticas en formato entero de 8 bits (`uint8`), con resolución uniforme de 28x28 píxeles (784 variables por muestra). El conjunto está dividido en 10 categorías de productos de vestuario y calzado, distribuido originalmente en 60,000 muestras para entrenamiento y 10,000 para prueba.
-
-### Mapeo de Categorías
-| Etiqueta | Clase Oficial (Inglés) | Descripción en Español |
-| :---: | :--- | :--- |
-| 0 | T-shirt/top | Camiseta / Top |
-| 1 | Trouser | Pantalón |
-| 2 | Pullover | Suéter / Jersey |
-| 3 | Dress | Vestido |
-| 4 | Coat | Abrigo |
-| 5 | Sandal | Sandalia |
-| 6 | Shirt | Camisa |
-| 7 | Sneaker | Zapatilla deportiva |
-| 8 | Bag | Bolso / Cartera |
-| 9 | Ankle boot | Bota al tobillo |
+### Category Mapping
+| Label | Class |
+| :---: | :--- |
+| 0 | T-shirt/top |
+| 1 | Trouser |
+| 2 | Pullover |
+| 3 | Dress |
+| 4 | Coat |
+| 5 | Sandal |
+| 6 | Shirt |
+| 7 | Sneaker |
+| 8 | Bag |
+| 9 | Ankle boot |
 
 ---
 
-## 2. Adquisición y Verificación de Integridad Criptográfica
+## 2. Adquisition and Cryptographic Integrity Verification
 
-Los archivos se distribuyen comprimidos mediante gzip en formato binario IDX. Se encuentran disponibles en el repositorio oficial de Zalando Research: [github.com/zalandoresearch/fashion-mnist](https://github.com/zalandoresearch/fashion-mnist).
+The files are distributes compressed in a .gz file format. They are available in the official Zalando Research repository: [github.com/zalandoresearch/fashion-mnist](https://github.com/zalandoresearch/fashion-mnist).
 
-### Enlaces Oficiales de Descarga
+### Official Download Links
 - `train-images-idx3-ubyte.gz`: http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-images-idx3-ubyte.gz
 - `train-labels-idx1-ubyte.gz`: http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-labels-idx1-ubyte.gz
 - `t10k-images-idx3-ubyte.gz`: http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-images-idx3-ubyte.gz
 - `t10k-labels-idx1-ubyte.gz`: http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-labels-idx1-ubyte.gz
 
-### Sumas de Comprobación y Tamaño de Archivos
-| Archivo | Tamaño en Disco | Hash MD5 Oficial | Hash SHA-256 Oficial |
+### Check Sum & File size
+| File | Size on Disk | Official Hash MD5 | Official Hash SHA-256 |
 | :--- | :--- | :--- | :--- |
 | `train-images-idx3-ubyte.gz` | 26,421,880 bytes (~25.2 MB) | `8d4fb7e6c68d591d4c3dfef9ec88bf0d` | `3aede38d61863908ad78613f6a32ed271626dd12800ba2636569512369268a84` |
 | `train-labels-idx1-ubyte.gz` | 29,515 bytes (~28.8 KB) | `25c81989df183df01b3e8a0aad5dffbe` | `a04f17134ac03560a47e3764e11b92fc97de4d1bfaf8ba1a3aa29af54cc90845` |
 | `t10k-images-idx3-ubyte.gz` | 4,422,102 bytes (~4.2 MB) | `bef4ecab320f06d8554ea6380940ec79` | `346e55b948d973a97e58d2351dde16a484bd415d4595297633bb08f03db6a073` |
 | `t10k-labels-idx1-ubyte.gz` | 5,148 bytes (~5.0 KB) | `bb300cfdad3c16e7a12a480ee83cd310` | `67da17c76eaffca5446c3361aaab5c3cd6d1c2608764d35dfb1850b086bf8dd5` |
 
-Para verificar la integridad de los archivos descargados:
+To verify the integrity on the downloaded files:
 ```bash
 python dataset_info.py
 ```
 
 ---
 
-## 3. Estructura del Repositorio
+## 3. Repository Structure
 
-El directorio de trabajo está estructurado según los lineamientos del taller:
+The directory is structured as follows:
 
 ```
 Workshop_1/
 ├── src/
 │   ├── __init__.py
-│   ├── data_loader.py          # Carga de binarios IDX, división reproducible y aumentaciones
-│   ├── features.py             # Escalado z-score y reducción de dimensionalidad con PCA
-│   └── baselines.py            # Entrenamiento, evaluación y exportación de modelos base
+│   ├── data_loader.py          # Binary IDX load, reproductible division and augmentations
+│   ├── features.py             # Z-score scaling and dimensionality reduction with PCA
+│   └── baselines.py            # Training, testing and base models exportation
 ├── notebooks/
-│   └── SupervisedLearning.ipynb # Cuaderno interactivo con EDA, pipeline y modelos base
+│   └── SupervisedLearning.ipynb # Notebook with the complete EDA, visualizations and analysi
 ├── data/
-│   ├── raw/                    # Archivos binarios comprimidos .gz originales
-│   └── splits.json             # Índices estratificados de train (49k), val (10.5k), test (10.5k)
+│   ├── raw/                    # Compressed original binary files .gz
+│   └── splits.json             # Stratified indexes of train (49k), val (10.5k), test (10.5k)
 ├── checkpoints/
 │   ├── Logistic_Regression.joblib
 │   ├── Random_Forest.joblib
 │   └── Hist_Gradient_Boosting.joblib
 ├── runs/
-│   └── results.json            # Métricas detalladas, reportes y matrices de confusión
+│   └── results.json            # Detailed metricsMétricas detalladas, reportes y matrices de confusión
 ├── dataset_info.py              # Script CLI para verificación de integridad y estadísticas
-├── pyproject.toml              # Definición de dependencias y configuración Poetry
-├── poetry.lock                 # Bloqueo de dependencias
-└── README.md                   # Documentación técnica del taller
+├── pyproject.toml              # Dependencies definition and Poetry configuration
+├── poetry.lock                 # Dependencies blocking
+└── README.md                   # Technical documentation of the workshop
 ```
 
 ---
 
-## 4. Instalación y Configuración del Entorno
+## 4. Environment Installation and Configuration
 
-El proyecto requiere **Python 3.11**. Las dependencias pueden instalarse utilizando Poetry o mediante un entorno virtual con `pip`:
+The project requires **Python 3.11**. The dependencies can be installed using Poetry or in a virtual environment using `pip`:
 
-### Opción A: Usando Poetry (Recomendado)
+### Option A: Using Poetry
 ```bash
-# Instalar dependencias
+# Install dependencies
 poetry install
 
-# Activar el entorno virtual
+# Activate the virtual environment
 poetry shell
 ```
 
-### Opción B: Usando venv y pip
+### Option B: Using venv y pip
 ```bash
-# Crear el entorno virtual
+# Create the venv
 python -m venv venv
 
-# Activar en Windows PowerShell
+# Activate on Windows PowerShell
 .\venv\Scripts\Activate.ps1
 
-# Activar en Linux/macOS
+# Activate on Linux/macOS
 source venv/bin/activate
 
-# Instalar dependencias
+# Install dependencies
 pip install numpy pandas matplotlib scikit-learn scipy joblib
 ```
 
 ---
 
-## 5. Guía de Reproducción de Experimentos
+## 5. Reproductibility guide
 
-### Paso 1: Validación de Datos e Integridad
-Ejecutar la comprobación criptográfica y estructural:
+### Step 1: Data validation and integrity
+Execute the cryptographic and structural validation:
 ```bash
 python dataset_info.py
 ```
 
-### Paso 2: Ejecución del Pipeline y Entrenamiento de Modelos Base
-El script `src/baselines.py` automatiza la carga de datos, la lectura o generación de `data/splits.json`, el escalado estandarizado (`StandardScaler`), la proyección por PCA (95% de varianza explicada, reduciendo a 256 dimensiones), el ajuste de los 3 clasificadores y el cálculo de métricas:
+### Step 2: Pipeline execution and training base models
+The script `src/baselines.py` automatice data loading, the reading or generation of `data/splits.json`, the standard scaling (`StandardScaler`), projection with PCA (95% of explained variance, reducing to 256 dimensions), the adjustment of the 3 classifiers and metrics calculus:
 ```bash
 python -m src.baselines
 ```
 
-### Paso 3: Exploración Interactiva en Jupyter Notebook
-Para visualizar el análisis exploratorio de datos (EDA), la varianza acumulada de componentes y las matrices de confusión:
-```bash
-jupyter notebook notebooks/SupervisedLearning.ipynb
-```
+### Step 3: Stratified Partition (Train / Val / Test)
+Based on the 70,000 images, a reproductible division was registered on `data/splits.json`:
+- **Training (70%):** 49,000 samples (4,900 by class).
+- **Validation (15%):** 10,500 samples (1,050 by class).
+- **Test (15%):** 10,500 samples (1,050 by class).
 
----
+The imbalance ratio is exactly 1.0, which avoid any bias by category frequency.
 
-## 6. Resultados y Discusión Técnica
+### Step 4: Exploration in Jupyter Notebook
+To visualize the exploratory data analysis (EDA), acumulative variance of components and confusion matrixes, refer to `notebooks/eda.ipynb`
 
-### Partición Estratificada (Train / Val / Test)
-A partir del universo de 70,000 imágenes, se implementó una división reproducible registrada en `data/splits.json`:
-- **Entrenamiento (70%):** 49,000 muestras (4,900 por clase).
-- **Validación (15%):** 10,500 muestras (1,050 por clase).
-- **Prueba (15%):** 10,500 muestras (1,050 por clase).
-
-La tasa de desbalance de clases (*Imbalance Ratio*) es exactamente **1.0**, lo que elimina cualquier sesgo por frecuencia de categorías.
-
-### Rendimiento Comparativo de los Modelos Base
-A continuación se resumen los resultados obtenidos sobre los conjuntos de validación y prueba (con fijación de semilla aleatoria `seed = 42`):
-
-| Modelo | Tiempo de Entrenamiento | Exactitud (Val) | Macro F1 (Val) | Exactitud (Test) | Macro F1 (Test) | AUC-ROC Test (OvR) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Regresión Logística** | 38.6 s | 85.15% | 0.8503 | 85.31% | 0.8519 | 0.9837 |
-| **Random Forest (100 árboles)** | 12.5 s | 86.59% | 0.8637 | 85.90% | 0.8565 | 0.9866 |
-| **HistGradientBoosting** | 31.2 s | **88.30%** | **0.8825** | **87.48%** | **0.8740** | **0.9899** |
-
-### Análisis Morfológico de Confusión
-- **Alta separabilidad en calzado y accesorios:** Las categorías *Trouser* (F1 = 0.966), *Sandal* (F1 = 0.941), *Bag* (F1 = 0.932), *Sneaker* (F1 = 0.940) y *Ankle boot* (F1 = 0.923) muestran un agrupamiento distante en el espacio de características debido a siluetas nítidas y fondos contrastantes.
-- **Concentración de error en prendas superiores:** Más del 70% de los errores se concentran entre *Shirt*, *T-shirt/top*, *Pullover* y *Coat*. La clase *Shirt* (camisa) presenta el menor desempeño individual (F1 = 0.716), confundiéndose mutuamente con camisetas y abrigos debido a la similitud estructural de mangas y torso en baja resolución (28x28 píxeles).
-- **Conclusión metodológica:** Los modelos lineales y ensambles tradicionales alcanzan un techo de precisión cercano al 88%. Superar esta cota requerirá modelos de Deep Learning basados en capas convolucionales (CNN) en los siguientes talleres, capaces de capturar correlaciones espaciales locales e invariancia a pequeñas traslaciones.
+### Step 5: Model Training
+To train the different models, refer to the following files: `notebooks/MulticlassLogisticRegression`, `notebooks/RandomForest` and `notebooks/HistGradientBoosting`
