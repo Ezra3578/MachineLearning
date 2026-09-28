@@ -1,9 +1,8 @@
 """
 dataset_info.py
 ---------------
-Script para escanear y validar la integridad del conjunto de datos Fashion-MNIST.
-Verifica sumas de comprobación (MD5 y SHA-256), tamaños de archivo, cabeceras
-binarias IDX y distribución de clases.
+Script to scan and validate dataset integrity.
+Verify checksum (MD5 y SHA-256), filesize, binary header IDX y classes distributions.
 """
 
 import gzip
@@ -12,7 +11,7 @@ from pathlib import Path
 import struct
 import numpy as np
 
-# Sumas oficiales de control publicadas por Zalando Research
+# Official control checksums published by Zalando Research
 OFFICIAL_CHECKSUMS = {
     "train-images-idx3-ubyte.gz": {
         "md5": "8d4fb7e6c68d591d4c3dfef9ec88bf0d",
@@ -77,48 +76,48 @@ def read_idx_labels(file_path: Path):
 
 def inspect_dataset(data_dir: Path):
     print("=" * 70)
-    print("RESUMEN E INTEGRIDAD DEL CONJUNTO DE DATOS: FASHION-MNIST")
-    print(f"Directorio analizado: {data_dir.resolve()}")
+    print("Resume and integrity of dataset")
+    print(f"Directory analized: {data_dir.resolve()}")
     print("=" * 70)
 
     if not data_dir.exists():
-        print(f"Error: El directorio {data_dir} no existe.")
+        print(f"Error: The directory {data_dir} does not exist.")
         return
 
     gz_files = sorted(list(data_dir.glob("*.gz")))
     if not gz_files:
-        print(f"No se encontraron archivos .gz en {data_dir}.")
+        print(f"No files .gz where found on {data_dir}.")
         return
 
     total_bytes = sum(f.stat().st_size for f in gz_files)
-    print(f"Archivos encontrados: {len(gz_files)}")
-    print(f"Tamano total en disco: {total_bytes / (1024 * 1024):.2f} MB ({total_bytes:,} bytes)")
+    print(f"Files found: {len(gz_files)}")
+    print(f"Total size on disk: {total_bytes / (1024 * 1024):.2f} MB ({total_bytes:,} bytes)")
     print("-" * 70)
 
-    # Verificacion de sumas de comprobacion
-    print("VERIFICACION DE SUMAS DE CONTROL (HASH CHECKSUMS):")
+    # Check sums validations
+    print("Checksum verification (HASH CHECKSUMS):")
     all_ok = True
     for file_path in gz_files:
         name = file_path.name
         md5_calc, sha256_calc = compute_file_hashes(file_path)
         expected = OFFICIAL_CHECKSUMS.get(name)
 
-        status_md5 = "CORRECTO" if expected and md5_calc == expected["md5"] else "DESCONOCIDO/DISCREPANTE"
-        status_sha = "CORRECTO" if expected and sha256_calc == expected["sha256"] else "DESCONOCIDO/DISCREPANTE"
+        status_md5 = "CORRECT" if expected and md5_calc == expected["md5"] else "UNKNOWN/DIFFERENT"
+        status_sha = "CORRECT" if expected and sha256_calc == expected["sha256"] else "UNKNOWN/DIFFERENT"
 
-        print(f"\n* Archivo: {name}")
-        print(f"  Tamano: {file_path.stat().st_size:,} bytes")
+        print(f"\n* File: {name}")
+        print(f"  Size: {file_path.stat().st_size:,} bytes")
         print(f"  MD5:    {md5_calc} [{status_md5}]")
         print(f"  SHA256: {sha256_calc} [{status_sha}]")
 
-        if status_md5 != "CORRECTO" or status_sha != "CORRECTO":
+        if status_md5 != "CORRECT" or status_sha != "CORRECT":
             all_ok = False
 
     print("\n" + "-" * 70)
-    print(f"Estado global de integridad: {'INTEGRO Y VERIFICADO' if all_ok else 'REQUIERE REVISION'}")
+    print(f"Global state integrity: {'FULL AND VERIFIED' if all_ok else 'REQUIRES REVISION'}")
     print("-" * 70)
 
-    # Carga de datos para estadísticas estructurales
+    # Load data for structural statistics
     train_img_path = data_dir / "train-images-idx3-ubyte.gz"
     train_lbl_path = data_dir / "train-labels-idx1-ubyte.gz"
     test_img_path = data_dir / "t10k-images-idx3-ubyte.gz"
@@ -130,16 +129,16 @@ def inspect_dataset(data_dir: Path):
         m_k_img, n_k_img, shape_k, X_test = read_idx_images(test_img_path)
         m_k_lbl, n_k_lbl, y_test = read_idx_labels(test_lbl_path)
 
-        print("\nMETADATOS ESTRUCTURALES:")
-        print(f"  Entrenamiento: {n_t_img:,} imagenes de {shape_t[0]}x{shape_t[1]} pixeles (Magic: {m_t_img})")
-        print(f"  Etiquetas ent: {n_t_lbl:,} registros (Magic: {m_t_lbl})")
-        print(f"  Prueba:        {n_k_img:,} imagenes de {shape_k[0]}x{shape_k[1]} pixeles (Magic: {m_k_img})")
-        print(f"  Etiquetas pba: {n_k_lbl:,} registros (Magic: {m_k_lbl})")
-        print(f"  Rango de pixeles: min={X_train.min()}, max={X_train.max()} (tipo {X_train.dtype})")
-        print(f"  Rango de etiquetas: min={y_train.min()}, max={y_train.max()} (tipo {y_train.dtype})")
+        print("\n Structural Metadata:")
+        print(f"  Training: {n_t_img:,} images of {shape_t[0]}x{shape_t[1]} pixels (Magic: {m_t_img})")
+        print(f"  Labels: {n_t_lbl:,} registries (Magic: {m_t_lbl})")
+        print(f"  Test:        {n_k_img:,} images of {shape_k[0]}x{shape_k[1]} pixels (Magic: {m_k_img})")
+        print(f"  Labels: {n_k_lbl:,} registries (Magic: {m_k_lbl})")
+        print(f"  Pixels Range: min={X_train.min()}, max={X_train.max()} (type {X_train.dtype})")
+        print(f"  Labels Range: min={y_train.min()}, max={y_train.max()} (type {y_train.dtype})")
 
-        print("\nDISTRIBUCION DE MUESTRAS POR CLASE:")
-        print(f"{'Etiqueta':<10}{'Nombre de Clase':<20}{'Entrenamiento':<16}{'Prueba':<10}")
+        print("\nDISTRIBUTION OF SAMPLES PER CLASS:")
+        print(f"{'Label':<10}{'Class Name':<20}{'Training':<16}{'Test':<10}")
         print("-" * 56)
         train_counts = np.bincount(y_train, minlength=10)
         test_counts = np.bincount(y_test, minlength=10)
@@ -152,7 +151,7 @@ def inspect_dataset(data_dir: Path):
 
 
 if __name__ == "__main__":
-    # Buscar datos en data/raw o en code/data
+    # Search data en data/raw or in code/data
     base_dir = Path(__file__).resolve().parent
     primary_dir = base_dir / "data" / "raw"
     fallback_dir = base_dir / "code" / "data"
