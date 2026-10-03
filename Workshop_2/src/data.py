@@ -117,7 +117,7 @@ def load_fashion_mnist(
         ):
             train_x, train_y, test_x, test_y = _load_local_raw(raw)
         else:
-            print(f"[data] local raw files not found at {raw} — downloading via torchvision")
+            print(f"[data] local raw files not found at {raw} - downloading via torchvision")
             train_x, train_y, test_x, test_y = _load_torchvision(data_root / "raw")
     else:
         train_x, train_y, test_x, test_y = _load_torchvision(data_root / "raw")
@@ -146,7 +146,7 @@ def make_or_load_splits(
         if {"train", "val", "test"} <= set(splits) and total == len(labels):
             print(f"[data] reusing cached split from {splits_path}")
             return splits
-        print(f"[data] cached split unusable ({total} != {len(labels)}) — rebuilding")
+        print(f"[data] cached split unusable ({total} != {len(labels)}) - rebuilding")
 
     indices = np.arange(len(labels))
     train_idx, rest_idx = train_test_split(

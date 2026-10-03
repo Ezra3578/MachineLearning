@@ -124,4 +124,4 @@ if __name__ == "__main__":
             out = model(torch.zeros(4, 1 if name == "smallcnn" else 3, 28 if name == "smallcnn" else 224, 28 if name == "smallcnn" else 224))
         print(f"{name:>8}: trainable={trainable:,} total={total:,} | forward output {tuple(out.shape)}")
         assert out.shape == (4, NUM_CLASSES)
-    print("forward-pass check passed ✓")
+    print("forward-pass check passed [OK]")

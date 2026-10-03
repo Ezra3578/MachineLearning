@@ -3,7 +3,7 @@ This repository contains the information and retrievals of the workshops from th
 
 ## Members
 - Jhojan Stiven Aragón Ramírez - 20221020060
-- Santiago Reyes Gomez - 202210200
+- Santiago Reyes Gómez - 20221020068
 - Juan Andrés Jiménez Palomino - 20221020087
 
 ## Problem Domain

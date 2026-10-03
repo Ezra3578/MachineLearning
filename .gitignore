@@ -262,3 +262,12 @@ build/
 # ==============================
 
 .vscode/
+.venv-gpu/
+
+# Notebook demo artifacts
+notebook_demo/
+
+# Heavy run artifacts (model_best.pt is the deliverable)
+Workshop_2/checkpoints/resnet18/model_last.pt
+Workshop_2/runs/resnet18/train_stdout.log
+Workshop_2/runs/resnet18/train_stderr.log

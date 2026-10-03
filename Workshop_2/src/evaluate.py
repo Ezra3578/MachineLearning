@@ -46,20 +46,28 @@ def parse_args() -> argparse.Namespace:
 
 
 def pick_device(requested: str = "auto") -> torch.device:
+    if requested == "directml":
+        import torch_directml
+
+        return torch_directml.device()
     if requested != "auto":
         return torch.device(requested)
     if torch.cuda.is_available():
         return torch.device("cuda")
     if torch.backends.mps.is_available():
         return torch.device("mps")
-    return torch.device("cpu")
+    try:
+        import torch_directml
+    except ImportError:
+        return torch.device("cpu")
+    return torch_directml.device() if torch_directml.is_available() else torch.device("cpu")
 
 
 def main() -> None:
     args = parse_args()
     device = pick_device(args.device)
 
-    checkpoint = torch.load(args.checkpoint, map_location="cpu")
+    checkpoint = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
     model_name = checkpoint["model_name"]
     classes = checkpoint.get("classes", CLASS_NAMES)
     print(f"[evaluate] checkpoint={args.checkpoint} | model={model_name} | trained epoch={checkpoint.get('epoch')}")
