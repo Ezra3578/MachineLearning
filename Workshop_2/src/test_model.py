@@ -28,20 +28,28 @@ def parse_args() -> argparse.Namespace:
 
 
 def pick_device(requested: str = "auto") -> torch.device:
+    if requested == "directml":
+        import torch_directml
+
+        return torch_directml.device()
     if requested != "auto":
         return torch.device(requested)
     if torch.cuda.is_available():
         return torch.device("cuda")
     if torch.backends.mps.is_available():
         return torch.device("mps")
-    return torch.device("cpu")
+    try:
+        import torch_directml
+    except ImportError:
+        return torch.device("cpu")
+    return torch_directml.device() if torch_directml.is_available() else torch.device("cpu")
 
 
 def main() -> None:
     args = parse_args()
     device = pick_device(args.device)
 
-    checkpoint = torch.load(args.checkpoint, map_location="cpu")
+    checkpoint = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
     assert "state_dict" in checkpoint, "checkpoint missing 'state_dict'"
     model_name = checkpoint["model_name"]
     classes = checkpoint.get("classes", [str(i) for i in range(10)])
@@ -66,15 +74,15 @@ def main() -> None:
     assert logits.shape == (images.size(0), len(classes)), f"unexpected output shape {tuple(logits.shape)}"
     preds = probs.argmax(dim=1)
 
-    print(f"[test_model] inference on {images.size(0)} samples — output shape {tuple(logits.shape)} ✓")
+    print(f"[test_model] inference on {images.size(0)} samples - output shape {tuple(logits.shape)} [OK]")
     print(f"[test_model] {'#':>2}  {'true':<12} {'pred':<12} {'p(pred)':>8}  ok")
     for i in range(images.size(0)):
         true_name = classes[int(labels[i])]
         pred_name = classes[int(preds[i])]
-        mark = "✓" if int(preds[i]) == int(labels[i]) else "✗"
+        mark = "ok" if int(preds[i]) == int(labels[i]) else "XX"
         print(f"[test_model] {i:>2}  {true_name:<12} {pred_name:<12} {probs[i, preds[i]]:>8.4f}  {mark}")
 
-    print("[test_model] checkpoint verification passed ✓")
+    print("[test_model] checkpoint verification passed [OK]")
 
 
 if __name__ == "__main__":

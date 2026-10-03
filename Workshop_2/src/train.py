@@ -40,13 +40,21 @@ def seed_everything(seed: int = 42) -> None:
 
 
 def pick_device(requested: str = "auto") -> torch.device:
+    if requested == "directml":
+        import torch_directml
+
+        return torch_directml.device()
     if requested != "auto":
         return torch.device(requested)
     if torch.cuda.is_available():
         return torch.device("cuda")
     if torch.backends.mps.is_available():
         return torch.device("mps")
-    return torch.device("cpu")
+    try:
+        import torch_directml
+    except ImportError:
+        return torch.device("cpu")
+    return torch_directml.device() if torch_directml.is_available() else torch.device("cpu")
 
 
 def mixup_batch(
@@ -285,7 +293,7 @@ def main() -> None:
         "args": vars(args),
     }
     (runs_dir / "train_summary.json").write_text(json.dumps(summary, indent=2))
-    print(f"[train] done. best val macro-F1 {best_f1:.4f} at epoch {best_epoch} — saved {checkpoint_dir / 'model_best.pt'}")
+    print(f"[train] done. best val macro-F1 {best_f1:.4f} at epoch {best_epoch} - saved {checkpoint_dir / 'model_best.pt'}")
 
 
 if __name__ == "__main__":

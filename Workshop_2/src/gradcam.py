@@ -178,7 +178,7 @@ def run_analysis(
 ) -> Path:
     """Full Grad-CAM analysis: load checkpoint, pick examples, save figure."""
     torch_device = torch.device(device)
-    checkpoint_data = torch.load(checkpoint, map_location="cpu")
+    checkpoint_data = torch.load(checkpoint, map_location="cpu", weights_only=False)
     model_name = checkpoint_data["model_name"]
 
     model = build_model(model_name, num_classes=len(checkpoint_data.get("classes", CLASS_NAMES)), pretrained=False)
@@ -197,7 +197,7 @@ def run_analysis(
         cam, _, _ = cam_tool(image.to(torch_device))
         cams.append(cam)
         titles.append(f"{CLASS_NAMES[true]} → {CLASS_NAMES[pred]} ({prob:.2f})")
-        marker = "✓" if true == pred else "✗"
+        marker = "ok" if true == pred else "XX"
         print(f"  {marker} true={CLASS_NAMES[true]:<12} pred={CLASS_NAMES[pred]:<12} p={prob:.3f}")
     cam_tool.close()
 
