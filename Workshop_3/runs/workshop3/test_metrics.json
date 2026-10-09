@@ -1,0 +1,54 @@
+{
+  "rl_agent": {
+    "checkpoint": "checkpoints/agent_best.pt",
+    "n_episodes": 200,
+    "mean_return": 70.39,
+    "std_return": 6.3077650558656675,
+    "min_return": 56.0,
+    "max_return": 88.0,
+    "accuracy": 0.85195,
+    "f1_macro": null,
+    "per_class_accuracy": {
+      "0": 0.7973760932944607,
+      "1": 0.9545676599902296,
+      "2": 0.6926108374384237,
+      "3": 0.870136698212408,
+      "4": 0.8037160552644116,
+      "5": 0.9333672431332655,
+      "6": 0.6393275598573612,
+      "7": 0.9447541814495691,
+      "8": 0.941717791411043,
+      "9": 0.9471585244267199
+    }
+  },
+  "baselines": [
+    {
+      "policy": "random",
+      "n_episodes": 50,
+      "mean_return": -79.92,
+      "std_return": 5.98611727248974,
+      "accuracy": 0.1004
+    },
+    {
+      "policy": "majority",
+      "n_episodes": 50,
+      "mean_return": -79.44,
+      "std_return": 6.870691377146844,
+      "accuracy": 0.1028
+    },
+    {
+      "policy": "supervised-heuristic",
+      "n_episodes": 50,
+      "mean_return": 88.84,
+      "std_return": 4.916746892000847,
+      "accuracy": 0.9442
+    }
+  ],
+  "comparison_table_markdown": "| Model | Test accuracy | Macro F1 | Notes |\n|---|---|---|---|\n| HistGradientBoosting (W1 best) | 0.8748 | 0.8740 | supervised baseline |\n| RandomForest (W1) | TODO | TODO | supervised baseline |\n| XGBoost (W1) | TODO | TODO | supervised baseline |\n| SmallCNN (W2) | 0.9305 | 0.9302 | supervised baseline |\n| ResNet-18 (W2) | 0.9494 | 0.9494 | supervised baseline |\n| DQN (W3, this work) | 0.8519 | TODO | RL agent (return-derived) |\n\nRL accuracy derives from mean episode return; not directly comparable to supervised epochs \u2014 see sample-efficiency plot.\n- TODO(W1): fill final accuracy/macro-F1 for RandomForest, XGBoost, K-Means from Workshop_1.\n- TODO(W2): re-validate SmallCNN/ResNet-18 numbers against runs/test_metrics.json.\n- TODO(comparison): align total sample complexity (RL env-steps vs supervised labeled examples).",
+  "pending_todos": [
+    "TODO(W1): fill final accuracy/macro-F1 for RandomForest, XGBoost, K-Means from Workshop_1.",
+    "TODO(W2): re-validate SmallCNN/ResNet-18 numbers against runs/test_metrics.json.",
+    "TODO(comparison): align total sample complexity (RL env-steps vs supervised labeled examples)."
+  ],
+  "sample_efficiency_note": "TODO: compare total RL env-steps (see runs/workshop3/*/summary.json) against supervised labeled-example counts from W1/W2 once closed."
+}

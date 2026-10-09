@@ -203,6 +203,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--max-steps", type=int, default=100)
     p.add_argument("--reward-mode", choices=["plus_minus", "zero_one", "sparse"], default="plus_minus")
     p.add_argument("--batch-size", type=int, default=64)
+    p.add_argument("--warmup-steps", type=int, default=1000,
+                   help="replay warmup steps before first update (smoke-test overrides to 64)")
     p.add_argument("--val-every", type=int, default=10)
     p.add_argument("--val-episodes", type=int, default=20)
     p.add_argument("--seed", type=int, default=42)
@@ -224,11 +226,13 @@ def main() -> None:
         return
     if args.smoke_test:
         args.episodes, args.val_every, args.val_episodes = 5, 5, 2
+        args.warmup_steps, args.batch_size = 64, 32
         device = "cpu"
     names = list(CONFIGS) if (args.all_configs or args.config == "all") else [args.config]
     start = time.time()
     results = [train_config(n, episodes=args.episodes, max_steps=args.max_steps,
                             reward_mode=args.reward_mode, batch_size=args.batch_size,
+                            warmup_steps=args.warmup_steps,
                             val_every=args.val_every, val_episodes=args.val_episodes,
                             seed=args.seed, data_root=args.data_root,
                             checkpoint_dir=args.checkpoint_dir, runs_dir=args.runs_dir,

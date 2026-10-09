@@ -1,0 +1,15 @@
+{
+  "config": "b",
+  "hparams": {
+    "lr": 0.0005,
+    "gamma": 0.95,
+    "eps_decay": 0.995,
+    "weight_decay": 1e-05,
+    "desc": "mid LR/gamma/decay, light L2 (default)"
+  },
+  "episodes": 300,
+  "env_steps": 30000,
+  "best_val_smoothed": 65.5,
+  "best_episode": 300,
+  "trainable_params": 140458
+}

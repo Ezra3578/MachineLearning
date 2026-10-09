@@ -49,6 +49,14 @@ python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\act
 pip install -e .
 ```
 
+> Sin GPU NVIDIA (ej. AMD/Intel/CPU): instala primero el torch de CPU para
+> evitar la descarga pesada con CUDA, y luego el resto sin dependencias:
+> ```bash
+> pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+> pip install gymnasium scikit-learn matplotlib tqdm tensorboard
+> pip install -e . --no-deps
+> ```
+
 Requiere Python ≥ 3.10, PyTorch ≥ 2.0. Los datos se reutilizan desde
 `../Workshop_1/code/data` (via Workshop 2) o se descargan con torchvision en `data/raw`.
 

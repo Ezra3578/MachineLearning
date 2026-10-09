@@ -1,0 +1,15 @@
+{
+  "config": "a",
+  "hparams": {
+    "lr": 0.0001,
+    "gamma": 0.9,
+    "eps_decay": 0.99,
+    "weight_decay": 0.0,
+    "desc": "low LR, low gamma, fast exploration decay, no regularization"
+  },
+  "episodes": 300,
+  "env_steps": 30000,
+  "best_val_smoothed": 70.8,
+  "best_episode": 300,
+  "trainable_params": 140458
+}
