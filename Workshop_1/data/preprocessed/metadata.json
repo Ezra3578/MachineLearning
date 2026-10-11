@@ -1,0 +1,87 @@
+{
+  "dataset": "Fashion-MNIST",
+  "seed": 42,
+  "split_ratios": [
+    0.7,
+    0.15,
+    0.15
+  ],
+  "augmentation_ratio": 0.2,
+  "scaling": "standard",
+  "pca_variance_threshold": 0.95,
+  "pca_components": 255,
+  "pca_explained_variance": 0.9500018358230591,
+  "sample_counts": {
+    "total_before_augmentation": 70000,
+    "train_after_augmentation": 58800,
+    "val": 10500,
+    "test": 10500
+  },
+  "class_names": [
+    "T-shirt/top",
+    "Trouser",
+    "Pullover",
+    "Dress",
+    "Coat",
+    "Sandal",
+    "Shirt",
+    "Sneaker",
+    "Bag",
+    "Ankle boot"
+  ],
+  "class_counts": {
+    "train": [
+      5880,
+      5880,
+      5880,
+      5880,
+      5880,
+      5880,
+      5880,
+      5880,
+      5880,
+      5880
+    ],
+    "val": [
+      1050,
+      1050,
+      1050,
+      1050,
+      1050,
+      1050,
+      1050,
+      1050,
+      1050,
+      1050
+    ],
+    "test": [
+      1050,
+      1050,
+      1050,
+      1050,
+      1050,
+      1050,
+      1050,
+      1050,
+      1050,
+      1050
+    ]
+  },
+  "saved_arrays": [
+    "X_test_images",
+    "X_test_normalized",
+    "X_test_pca",
+    "X_test_scaled",
+    "X_train_images",
+    "X_train_normalized",
+    "X_train_pca",
+    "X_train_scaled",
+    "X_val_images",
+    "X_val_normalized",
+    "X_val_pca",
+    "X_val_scaled",
+    "y_test",
+    "y_train",
+    "y_val"
+  ]
+}
