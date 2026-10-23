@@ -11,7 +11,6 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import shutil
 import time
 import warnings
 from pathlib import Path
@@ -25,7 +24,7 @@ import torch
 import torch.nn as nn
 from torch.utils.tensorboard import SummaryWriter
 
-from src.data import CLASS_NAMES, build_gan_dataloaders
+from src.data import get_full_dataset, get_splits
 from src.gan import (
     Critic,
     Discriminator,
@@ -39,6 +38,32 @@ from src.gan import (
 warnings.filterwarnings("ignore", message=".*lerp.*")
 
 
+def _dml_safe_bce(prob: torch.Tensor, target: torch.Tensor, eps: float = 1e-7) -> torch.Tensor:
+    """DirectML-native Binary Cross-Entropy avoiding CPU fallback."""
+    p = torch.clamp(prob, eps, 1.0 - eps)
+    return -(target * torch.log(p) + (1.0 - target) * torch.log(1.0 - p)).mean()
+
+
+def _safe_torch_save(payload: dict, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    for attempt in range(5):
+        try:
+            torch.save(payload, path)
+            return
+        except RuntimeError:
+            time.sleep(0.5 * (attempt + 1))
+
+
+def _load_gan_train_tensors(seed: int = 42) -> tuple[torch.Tensor, torch.Tensor]:
+    """Load contiguous float32 [-1, 1] train images (49000, 1, 28, 28) and int64 labels."""
+    images, labels = get_full_dataset()
+    splits = get_splits(labels, seed=seed)
+    tr_idx = np.asarray(splits["train"], dtype=np.int64)
+    x_train = torch.from_numpy(images[tr_idx]).unsqueeze(1).float().div_(127.5).sub_(1.0).contiguous()
+    y_train = torch.from_numpy(labels[tr_idx]).long().contiguous()
+    return x_train, y_train
+
+
 def save_sample_grid(
     generator: Generator,
     fixed_z: torch.Tensor,
@@ -47,7 +72,7 @@ def save_sample_grid(
     title: str,
     nrow: int = 8,
 ) -> None:
-    """Render an 8x8 (or 4x4) grid of generated samples mapped from [-1, 1] to [0, 1]."""
+    """Render an 8x8 grid of generated samples mapped from [-1, 1] to [0, 1]."""
     generator.eval()
     with torch.no_grad():
         samples = generator(fixed_z, fixed_labels).cpu().numpy()[:, 0]
@@ -56,15 +81,16 @@ def save_sample_grid(
     n = len(samples)
     ncol = nrow
     nrow_grid = max(1, n // ncol)
-    fig, axes = plt.subplots(nrow_grid, ncol, figsize=(ncol * 1.25, nrow_grid * 1.25))
-    for i in range(nrow_grid * ncol):
+    canvas = np.ones((nrow_grid * 30 - 2, ncol * 30 - 2), dtype=np.float32)
+    for i in range(min(n, nrow_grid * ncol)):
         r, c = divmod(i, ncol)
-        ax = axes[r, c] if nrow_grid > 1 else axes[c]
-        if i < n:
-            ax.imshow(samples[i], cmap="gray", vmin=0, vmax=1)
-        ax.set_xticks([])
-        ax.set_yticks([])
-    fig.suptitle(title, fontsize=11, fontweight="bold", y=0.99)
+        canvas[r * 30 : r * 30 + 28, c * 30 : c * 30 + 28] = samples[i]
+
+    fig, ax = plt.subplots(figsize=(6.2, 6.2))
+    ax.imshow(canvas, cmap="gray", vmin=0, vmax=1)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_title(title, fontsize=11, fontweight="bold")
     fig.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=160, bbox_inches="tight")
@@ -73,7 +99,7 @@ def save_sample_grid(
 
 def train_vanilla_gan(
     epochs: int = 100,
-    batch_size: int = 256,
+    batch_size: int = 512,
     z_dim: int = 100,
     lr: float = 2e-4,
     label_smoothing: float = 0.9,
@@ -84,6 +110,7 @@ def train_vanilla_gan(
     device_name: str = "auto",
     checkpoint_dir: str | Path = "checkpoints",
     runs_dir: str | Path = "runs/workshop5",
+    cached_data: tuple[torch.Tensor, torch.Tensor] | None = None,
 ) -> dict:
     """Train Vanilla DCGAN with BCE loss and one-sided label smoothing."""
     set_seed(seed)
@@ -97,7 +124,8 @@ def train_vanilla_gan(
     samples_dir = run_dir / "samples"
     samples_dir.mkdir(parents=True, exist_ok=True)
 
-    train_loader, _, _ = build_gan_dataloaders(batch_size=batch_size, num_workers=0, seed=seed)
+    x_train_cpu, y_train_cpu = cached_data if cached_data is not None else _load_gan_train_tensors(seed=seed)
+    n_train = x_train_cpu.size(0)
 
     G = Generator(z_dim=z_dim, num_classes=num_classes).to(device)
     D = Discriminator(num_classes=num_classes).to(device)
@@ -117,6 +145,7 @@ def train_vanilla_gan(
     csv_path = run_dir / "train_log.csv"
     history: list[dict] = []
     t_start = time.time()
+    rng = torch.Generator().manual_seed(seed)
 
     print(
         f"[train_gan] model={run_name} | epochs={epochs} batch={batch_size} lr={lr} "
@@ -141,26 +170,30 @@ def train_vanilla_gan(
             d_prob_fake_sum = 0.0
             n_seen = 0
 
-            for b_idx, (real_x, real_y) in enumerate(train_loader):
-                if max_batches_per_epoch is not None and b_idx >= max_batches_per_epoch:
-                    break
-                real_x = real_x.to(device)
-                bsz = real_x.size(0)
-                y_cond = real_y.to(device) if conditional else None
+            perm = torch.randperm(n_train, generator=rng)
+            n_batches = n_train // batch_size
+            if max_batches_per_epoch is not None:
+                n_batches = min(n_batches, max_batches_per_epoch)
 
-                real_targets = torch.full((bsz,), float(label_smoothing), device=device)
-                fake_targets = torch.zeros(bsz, device=device)
-                gen_targets = torch.ones(bsz, device=device)
+            for b_idx in range(n_batches):
+                idx = perm[b_idx * batch_size : (b_idx + 1) * batch_size]
+                real_x = x_train_cpu[idx].to(device)
+                bsz = real_x.size(0)
+                y_cond = y_train_cpu[idx].to(device) if conditional else None
+
+                real_targets = torch.full((bsz,), float(label_smoothing), dtype=torch.float32, device=device)
+                fake_targets = torch.zeros(bsz, dtype=torch.float32, device=device)
+                gen_targets = torch.ones(bsz, dtype=torch.float32, device=device)
 
                 # 1. Train Discriminator
                 opt_d.zero_grad()
                 out_real = D(real_x, y_cond)
-                loss_d_real = criterion(out_real, real_targets)
+                loss_d_real = _dml_safe_bce(out_real, real_targets)
 
                 z = torch.randn(bsz, z_dim, device=device)
                 fake_x = G(z, y_cond)
                 out_fake = D(fake_x.detach(), y_cond)
-                loss_d_fake = criterion(out_fake, fake_targets)
+                loss_d_fake = _dml_safe_bce(out_fake, fake_targets)
 
                 loss_d = 0.5 * (loss_d_real + loss_d_fake)
                 loss_d.backward()
@@ -169,7 +202,7 @@ def train_vanilla_gan(
                 # 2. Train Generator
                 opt_g.zero_grad()
                 out_fake_for_g = D(fake_x, y_cond)
-                loss_g = criterion(out_fake_for_g, gen_targets)
+                loss_g = _dml_safe_bce(out_fake_for_g, gen_targets)
                 loss_g.backward()
                 opt_g.step()
 
@@ -217,8 +250,8 @@ def train_vanilla_gan(
     writer.close()
     ckpt_path = ckpt_root / ("gan_vanilla_cond_best.pt" if conditional else "gan_vanilla_best.pt")
     payload = {
-        "generator_state_dict": G.state_dict(),
-        "discriminator_state_dict": D.state_dict(),
+        "generator_state_dict": {k: v.detach().cpu().clone() for k, v in G.state_dict().items()},
+        "discriminator_state_dict": {k: v.detach().cpu().clone() for k, v in D.state_dict().items()},
         "model_type": "vanilla",
         "z_dim": z_dim,
         "num_classes": num_classes,
@@ -235,7 +268,7 @@ def train_vanilla_gan(
             "seed": seed,
         },
     }
-    torch.save(payload, ckpt_path)
+    _safe_torch_save(payload, ckpt_path)
     summary = {
         "run_name": run_name,
         "model": "vanilla",
@@ -252,9 +285,9 @@ def train_vanilla_gan(
 
 def train_wgan_gp(
     epochs: int = 100,
-    batch_size: int = 256,
+    batch_size: int = 512,
     z_dim: int = 100,
-    lr: float = 1e-4,
+    lr: float = 2e-4,
     n_critic: int = 5,
     lambda_gp: float = 10.0,
     conditional: bool = False,
@@ -264,6 +297,7 @@ def train_wgan_gp(
     device_name: str = "auto",
     checkpoint_dir: str | Path = "checkpoints",
     runs_dir: str | Path = "runs/workshop5",
+    cached_data: tuple[torch.Tensor, torch.Tensor] | None = None,
 ) -> dict:
     """Train Wasserstein GAN with Gradient Penalty (Gulrajani et al. 2017)."""
     set_seed(seed)
@@ -277,7 +311,8 @@ def train_wgan_gp(
     samples_dir = run_dir / "samples"
     samples_dir.mkdir(parents=True, exist_ok=True)
 
-    train_loader, _, _ = build_gan_dataloaders(batch_size=batch_size, num_workers=0, seed=seed)
+    x_train_cpu, y_train_cpu = cached_data if cached_data is not None else _load_gan_train_tensors(seed=seed)
+    n_train = x_train_cpu.size(0)
 
     G = Generator(z_dim=z_dim, num_classes=num_classes).to(device)
     C = Critic(num_classes=num_classes).to(device)
@@ -296,6 +331,7 @@ def train_wgan_gp(
     csv_path = run_dir / "train_log.csv"
     history: list[dict] = []
     t_start = time.time()
+    rng = torch.Generator().manual_seed(seed)
 
     print(
         f"[train_gan] model={run_name} | epochs={epochs} batch={batch_size} lr={lr} "
@@ -319,12 +355,16 @@ def train_wgan_gp(
             n_c_steps = 0
             n_g_steps = 0
 
-            for b_idx, (real_x, real_y) in enumerate(train_loader):
-                if max_batches_per_epoch is not None and b_idx >= max_batches_per_epoch:
-                    break
-                real_x = real_x.to(device)
+            perm = torch.randperm(n_train, generator=rng)
+            n_batches = n_train // batch_size
+            if max_batches_per_epoch is not None:
+                n_batches = min(n_batches, max_batches_per_epoch)
+
+            for b_idx in range(n_batches):
+                idx = perm[b_idx * batch_size : (b_idx + 1) * batch_size]
+                real_x = x_train_cpu[idx].to(device)
                 bsz = real_x.size(0)
-                y_cond = real_y.to(device) if conditional else None
+                y_cond = y_train_cpu[idx].to(device) if conditional else None
 
                 # 1. Train Critic
                 opt_c.zero_grad()
@@ -390,8 +430,8 @@ def train_wgan_gp(
     writer.close()
     ckpt_path = ckpt_root / ("gan_wgan_cond_best.pt" if conditional else "gan_wgan_best.pt")
     payload = {
-        "generator_state_dict": G.state_dict(),
-        "critic_state_dict": C.state_dict(),
+        "generator_state_dict": {k: v.detach().cpu().clone() for k, v in G.state_dict().items()},
+        "critic_state_dict": {k: v.detach().cpu().clone() for k, v in C.state_dict().items()},
         "model_type": "wgan_gp",
         "z_dim": z_dim,
         "num_classes": num_classes,
@@ -409,7 +449,7 @@ def train_wgan_gp(
             "seed": seed,
         },
     }
-    torch.save(payload, ckpt_path)
+    _safe_torch_save(payload, ckpt_path)
     summary = {
         "run_name": run_name,
         "model": "wgan_gp",
@@ -431,7 +471,6 @@ def plot_gan_training_curves(vanilla_summary: dict, wgan_summary: dict, out_path
     v_hist = vanilla_summary["history"]
     w_hist = wgan_summary["history"]
 
-    # Panel 1: Vanilla GAN Losses
     ax = axes[0]
     eps_v = [r["epoch"] for r in v_hist]
     ax.plot(eps_v, [r["d_loss"] for r in v_hist], label="Discriminator BCE Loss", linewidth=2.0, color="#1f77b4")
@@ -442,7 +481,6 @@ def plot_gan_training_curves(vanilla_summary: dict, wgan_summary: dict, out_path
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=8.5)
 
-    # Panel 2: Vanilla GAN Discriminator Real/Fake Accuracy
     ax = axes[1]
     ax.plot(eps_v, [r["d_acc_real"] * 100 for r in v_hist], label="D Accuracy on Real (%)", linewidth=2.0, color="#2ca02c")
     ax.plot(eps_v, [r["d_acc_fake"] * 100 for r in v_hist], label="D Accuracy on Fake (%)", linewidth=2.0, color="#d62728")
@@ -454,7 +492,6 @@ def plot_gan_training_curves(vanilla_summary: dict, wgan_summary: dict, out_path
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=8.5)
 
-    # Panel 3: WGAN-GP Wasserstein Distance & Gradient Penalty
     ax = axes[2]
     eps_w = [r["epoch"] for r in w_hist]
     ax.plot(
@@ -492,7 +529,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--z-dim", type=int, default=100)
     parser.add_argument("--conditional", action="store_true")
     parser.add_argument("--epochs", type=int, default=100)
-    parser.add_argument("--batch-size", type=int, default=256)
+    parser.add_argument("--batch-size", type=int, default=512)
     parser.add_argument("--lr", type=float, default=2e-4)
     parser.add_argument("--label-smoothing", type=float, default=0.9)
     parser.add_argument("--n-critic", type=int, default=5)
@@ -508,12 +545,13 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    cached = _load_gan_train_tensors(seed=args.seed)
     if args.run_all:
         s_van = train_vanilla_gan(
             epochs=args.epochs,
             batch_size=args.batch_size,
             z_dim=args.z_dim,
-            lr=2e-4,
+            lr=args.lr,
             label_smoothing=args.label_smoothing,
             conditional=args.conditional,
             sample_interval=args.sample_interval,
@@ -522,12 +560,13 @@ def main() -> None:
             device_name=args.device,
             checkpoint_dir=args.checkpoint_dir,
             runs_dir=args.runs_dir,
+            cached_data=cached,
         )
         s_wgan = train_wgan_gp(
             epochs=args.epochs,
             batch_size=args.batch_size,
             z_dim=args.z_dim,
-            lr=2e-4,
+            lr=args.lr,
             n_critic=args.n_critic,
             lambda_gp=args.lambda_gp,
             conditional=args.conditional,
@@ -537,6 +576,7 @@ def main() -> None:
             device_name=args.device,
             checkpoint_dir=args.checkpoint_dir,
             runs_dir=args.runs_dir,
+            cached_data=cached,
         )
         plot_gan_training_curves(s_van, s_wgan, Path(args.runs_dir) / "gan_training_curves.png")
         print("[train_gan] completed both Vanilla GAN and WGAN-GP runs [OK]")
@@ -554,6 +594,7 @@ def main() -> None:
             device_name=args.device,
             checkpoint_dir=args.checkpoint_dir,
             runs_dir=args.runs_dir,
+            cached_data=cached,
         )
     else:
         train_wgan_gp(
@@ -570,6 +611,7 @@ def main() -> None:
             device_name=args.device,
             checkpoint_dir=args.checkpoint_dir,
             runs_dir=args.runs_dir,
+            cached_data=cached,
         )
 
 

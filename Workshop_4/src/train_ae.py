@@ -388,6 +388,15 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _safe_copy2(src: Path, dst: Path) -> None:
+    for attempt in range(5):
+        try:
+            shutil.copy2(src, dst)
+            return
+        except OSError:
+            time.sleep(0.5 * (attempt + 1))
+
+
 def main() -> None:
     args = parse_args()
     ckpt_root = Path(args.checkpoint_dir)
@@ -400,6 +409,13 @@ def main() -> None:
 
         # 1. Standard AE across z_dim in {32, 64, 128}
         for z_dim in (32, 64, 128):
+            z32_summary_path = runs_root / "ae_z32" / "summary.json"
+            if z_dim == 32 and z32_summary_path.exists() and (ckpt_root / "ae_z32_best.pt").exists():
+                existing = json.loads(z32_summary_path.read_text(encoding="utf-8"))
+                if existing.get("trainable_params") == 263985:
+                    print(f"[train_ae] reusing completed ae_z32 (best_val_mse={existing['best_val_mse_pixel']:.5f})")
+                    summaries.append(existing)
+                    continue
             s = train_one_run(
                 model_type="ae",
                 z_dim=z_dim,
@@ -414,7 +430,7 @@ def main() -> None:
             )
             summaries.append(s)
 
-        shutil.copy2(ckpt_root / "ae_z64_best.pt", ckpt_root / "ae_best.pt")
+        _safe_copy2(ckpt_root / "ae_z64_best.pt", ckpt_root / "ae_best.pt")
 
         # 2. Variational Autoencoder across beta in {0.5, 1.0, 4.0} at z_dim=64
         for beta in (0.5, 1.0, 4.0):
@@ -434,7 +450,7 @@ def main() -> None:
             )
             summaries.append(s)
 
-        shutil.copy2(ckpt_root / "vae_z64_beta1.0_best.pt", ckpt_root / "vae_best.pt")
+        _safe_copy2(ckpt_root / "vae_z64_beta1.0_best.pt", ckpt_root / "vae_best.pt")
 
         # 3. Denoising Autoencoder (optional extension)
         s_dae = train_one_run(
@@ -451,7 +467,7 @@ def main() -> None:
             cached_tensors=full_tensors,
         )
         summaries.append(s_dae)
-        shutil.copy2(Path(s_dae["checkpoint"]), ckpt_root / "dae_best.pt")
+        _safe_copy2(Path(s_dae["checkpoint"]), ckpt_root / "dae_best.pt")
 
         # 4. Anomaly Detection models (trained on Normal classes only, excluding Bag [8])
         s_ae_anom = train_one_run(
@@ -468,7 +484,7 @@ def main() -> None:
             cached_tensors=anom_tensors,
         )
         summaries.append(s_ae_anom)
-        shutil.copy2(Path(s_ae_anom["checkpoint"]), ckpt_root / "ae_anomaly_best.pt")
+        _safe_copy2(Path(s_ae_anom["checkpoint"]), ckpt_root / "ae_anomaly_best.pt")
 
         s_vae_anom = train_one_run(
             model_type="vae",
@@ -486,7 +502,7 @@ def main() -> None:
             cached_tensors=anom_tensors,
         )
         summaries.append(s_vae_anom)
-        shutil.copy2(Path(s_vae_anom["checkpoint"]), ckpt_root / "vae_anomaly_best.pt")
+        _safe_copy2(Path(s_vae_anom["checkpoint"]), ckpt_root / "vae_anomaly_best.pt")
 
         plot_training_curves(summaries, runs_root / "training_curves.png")
         (runs_root / "all_train_summaries.json").write_text(

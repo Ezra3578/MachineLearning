@@ -1,0 +1,75 @@
+{
+  "num_samples_evaluated": 5000,
+  "real_test_reference": {
+    "frechet_distance": 0.0,
+    "inception_score_mean": 8.327007484436034,
+    "inception_score_std": 0.09730075975896137,
+    "mean_confidence": 0.933405876159668,
+    "high_conf_fraction_085": 0.8391428571428572,
+    "covered_modes_gt_2pct": 10,
+    "class_entropy_nats": 2.3023955484796965,
+    "max_entropy_nats": 2.302585092994046,
+    "kl_to_uniform": 0.00018954451434894965,
+    "intra_class_l2_diversity": 8.841577577590943,
+    "class_frequencies": {
+      "T-shirt/top": 0.0976,
+      "Trouser": 0.0997,
+      "Pullover": 0.1023,
+      "Dress": 0.103,
+      "Coat": 0.1012,
+      "Sandal": 0.0992,
+      "Shirt": 0.0964,
+      "Sneaker": 0.1015,
+      "Bag": 0.0998,
+      "Ankle boot": 0.0992
+    }
+  },
+  "vanilla_gan": {
+    "frechet_distance": 1.5598961137663423,
+    "inception_score_mean": 6.711370325088501,
+    "inception_score_std": 0.13110144650839428,
+    "mean_confidence": 0.8520491123199463,
+    "high_conf_fraction_085": 0.6448,
+    "covered_modes_gt_2pct": 10,
+    "class_entropy_nats": 2.2891180812304914,
+    "max_entropy_nats": 2.302585092994046,
+    "kl_to_uniform": 0.013467011763553806,
+    "intra_class_l2_diversity": 8.750631713867188,
+    "class_frequencies": {
+      "T-shirt/top": 0.0748,
+      "Trouser": 0.0962,
+      "Pullover": 0.0778,
+      "Dress": 0.103,
+      "Coat": 0.0966,
+      "Sandal": 0.1156,
+      "Shirt": 0.1264,
+      "Sneaker": 0.0846,
+      "Bag": 0.1138,
+      "Ankle boot": 0.1112
+    }
+  },
+  "wgan_gp": {
+    "frechet_distance": 5.166214474706148,
+    "inception_score_mean": 6.126628828048706,
+    "inception_score_std": 0.09107889051298108,
+    "mean_confidence": 0.8242748975753784,
+    "high_conf_fraction_085": 0.5802,
+    "covered_modes_gt_2pct": 10,
+    "class_entropy_nats": 2.2819261592216122,
+    "max_entropy_nats": 2.302585092994046,
+    "kl_to_uniform": 0.02065893377243304,
+    "intra_class_l2_diversity": 8.528323888778687,
+    "class_frequencies": {
+      "T-shirt/top": 0.0938,
+      "Trouser": 0.1054,
+      "Pullover": 0.0626,
+      "Dress": 0.1156,
+      "Coat": 0.1222,
+      "Sandal": 0.1234,
+      "Shirt": 0.1104,
+      "Sneaker": 0.0778,
+      "Bag": 0.0784,
+      "Ankle boot": 0.1104
+    }
+  }
+}
