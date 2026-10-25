@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "team3-workshop6"
+version = "0.1.0"
+description = "Workshop 6: domain transfer from Fashion-MNIST CNNs to PneumoniaMNIST chest X-rays"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0",
+    "torchvision",
+    "medmnist",
+    "scikit-learn",
+    "opencv-python-headless",
+    "matplotlib",
+    "tqdm",
+    "numpy",
+]
+
+[tool.setuptools]
+packages = ["src"]

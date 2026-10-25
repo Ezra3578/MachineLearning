@@ -1,0 +1,115 @@
+{
+  "checkpoint": "checkpoints/finetune_weights_best.pt",
+  "threshold": 0.5,
+  "confusion_at_threshold": {
+    "TP": 388,
+    "FP": 61,
+    "TN": 173,
+    "FN": 2
+  },
+  "cases": {
+    "correct_pneumonia": [
+      215,
+      92,
+      127,
+      277
+    ],
+    "correct_normal": [
+      511,
+      3,
+      310,
+      69
+    ],
+    "false_negative": [
+      176,
+      571
+    ],
+    "false_positive": [
+      103,
+      380,
+      9,
+      67
+    ]
+  },
+  "case_details": {
+    "correct_pneumonia": [
+      {
+        "index": 215,
+        "true": "pneumonia",
+        "p_pneumonia": 1.0
+      },
+      {
+        "index": 92,
+        "true": "pneumonia",
+        "p_pneumonia": 1.0
+      },
+      {
+        "index": 127,
+        "true": "pneumonia",
+        "p_pneumonia": 1.0
+      },
+      {
+        "index": 277,
+        "true": "pneumonia",
+        "p_pneumonia": 1.0
+      }
+    ],
+    "correct_normal": [
+      {
+        "index": 511,
+        "true": "normal",
+        "p_pneumonia": 0.0
+      },
+      {
+        "index": 3,
+        "true": "normal",
+        "p_pneumonia": 0.0
+      },
+      {
+        "index": 310,
+        "true": "normal",
+        "p_pneumonia": 0.0
+      },
+      {
+        "index": 69,
+        "true": "normal",
+        "p_pneumonia": 0.0
+      }
+    ],
+    "false_negative": [
+      {
+        "index": 176,
+        "true": "pneumonia",
+        "p_pneumonia": 0.4601
+      },
+      {
+        "index": 571,
+        "true": "pneumonia",
+        "p_pneumonia": 0.4714
+      }
+    ],
+    "false_positive": [
+      {
+        "index": 103,
+        "true": "normal",
+        "p_pneumonia": 1.0
+      },
+      {
+        "index": 380,
+        "true": "normal",
+        "p_pneumonia": 1.0
+      },
+      {
+        "index": 9,
+        "true": "normal",
+        "p_pneumonia": 0.9999
+      },
+      {
+        "index": 67,
+        "true": "normal",
+        "p_pneumonia": 0.9999
+      }
+    ]
+  },
+  "figure": "runs\\workshop6\\gradcam_analysis.png"
+}
