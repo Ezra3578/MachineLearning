@@ -9,8 +9,9 @@ classify Fashion-MNIST images formulated as a sequential decision process
 reward `+1/-1`). Same 70/15/15 split (seed 42) and normalization as Workshop 2,
 so metrics stay comparable.
 
-> Solo codigo (sin PDF) por peticion. El documento de formulacion MDP vive en
-> `docs/mdp_spec.md`; el reporte `groupN_workshop3.pdf` no se genera aqui.
+> El documento de formulacion MDP vive en `docs/mdp_spec.md`; el reporte
+> `group3_workshop3.pdf` se genera desde `docs/group3_workshop3.tex`
+> (`pdflatex` dos pasadas, ejecutado desde `docs/`).
 
 ## Results (placeholder — updated after final runs + W1/W2 closure)
 
@@ -106,4 +107,4 @@ python -m src.evaluate --checkpoint checkpoints/agent_best.pt --plot
 | `checkpoints/agent_best.pt` | `checkpoints/` |
 | `runs/workshop3/` logs | CSV + TensorBoard + PNGs |
 | Comparacion W1/W2 (pendiente cierre) | `src/compare_placeholders.py` |
-| Reporte PDF | NO incluido (peticion del usuario) |
+| Reporte PDF | `docs/group3_workshop3.tex` -> `group3_workshop3.pdf` |
