@@ -81,7 +81,10 @@ def compute_frechet_distance(feats_r: np.ndarray, feats_g: np.ndarray) -> float:
     sigma2 = np.cov(feats_g, rowvar=False)
 
     diff = mu1 - mu2
-    covmean, _ = scipy.linalg.sqrtm(sigma1.dot(sigma2), disp=False)
+    try:
+        covmean, _ = scipy.linalg.sqrtm(sigma1.dot(sigma2), disp=False)
+    except TypeError:  # SciPy >= 1.16 removed the ``disp`` argument
+        covmean = scipy.linalg.sqrtm(sigma1.dot(sigma2))
     if np.iscomplexobj(covmean):
         covmean = covmean.real
     fid = float(diff.dot(diff) + np.trace(sigma1 + sigma2 - 2.0 * covmean))

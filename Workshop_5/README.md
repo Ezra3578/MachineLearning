@@ -20,7 +20,9 @@ Workshop_5/
 │   ├── gan_vanilla_best.pt     # Best Vanilla GAN generator checkpoint
 │   └── gan_wgan_best.pt        # Best WGAN-GP generator checkpoint
 ├── runs/workshop5/             # Training logs, epoch sample grids (every 10 epochs), metrics JSONs
-├── notebooks/                  # Interactive notebooks
+├── notebooks/
+│   ├── Training_Pipeline.ipynb # Documented end-to-end adversarial training flow (executed)
+│   └── GAN_Evaluation.ipynb    # Quality metrics, failure modes and augmentation analysis (executed)
 └── pyproject.toml              # Package metadata and dependencies
 ```
 
@@ -31,6 +33,21 @@ cd Workshop_5
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e .
 ```
+
+## Notebooks
+
+Two executed notebooks document the workshop step by step. They call the same `src/` code as
+the CLI, so the cells are runnable references rather than a separate implementation:
+
+| Notebook | What it walks through | Runtime |
+|---|---|---|
+| `notebooks/Training_Pipeline.ipynb` | Data in `[-1, 1]`, Generator/Discriminator/Critic, gradient penalty, Vanilla GAN and WGAN-GP demo training, sample grids, FFD/IS evaluation, synthetic-set construction, checkpoint verification, full CLI commands | ~2 min demo (MPS/CPU) |
+| `notebooks/GAN_Evaluation.ipynb` | 100-epoch training curves, report quality table, real vs generated grids, mode-collapse/discriminator/WGAN-GP/checkerboard analysis, latent interpolation, 3-condition augmentation results | ~1 min (no retraining) |
+
+Both notebooks default to `DEMO = True` / artifact-only analysis and write demo outputs to
+`runs/notebook_demo/` and `checkpoints/notebook_demo/`, so the reported checkpoints and logs
+are never overwritten. Set `DEMO = False` in `Training_Pipeline.ipynb` to run the same 100-epoch
+schedule from the notebook.
 
 ## Quickstart
 
@@ -54,7 +71,7 @@ python -m src.evaluate_gan --vanilla-ckpt checkpoints/gan_vanilla_best.pt \
 
 # 6. Run 3-condition Data Augmentation Experiment (Real vs Real+Vanilla vs Real+WGAN-GP)
 python -m src.augment_and_retrain --vanilla-ckpt checkpoints/gan_vanilla_best.pt \
-    --wgan-ckpt checkpoints/gan_wgan_best.pt --num-synthetic 2500 --epochs 30
+    --wgan-ckpt checkpoints/gan_wgan_best.pt --num-synthetic 3000 --epochs 25
 ```
 
 ## Deliverables Mapping (`Workshop_5.pdf`)
