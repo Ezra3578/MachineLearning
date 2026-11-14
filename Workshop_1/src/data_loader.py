@@ -26,6 +26,15 @@ CLASS_NAMES = [
 
 
 def _read_idx3_images(file_path: Path) -> np.ndarray:
+    """
+    Read a gzip-compressed IDX3 file and return its images.
+
+    Args:
+        file_path (Path): Path to the IDX3 image file.
+
+    Returns:
+        np.ndarray: Image array with shape (N, rows, cols) and dtype uint8.
+    """
     with gzip.open(file_path, "rb") as f:
         _, n_images, n_rows, n_cols = struct.unpack(">IIII", f.read(16))
         data = np.frombuffer(f.read(), dtype=np.uint8)
@@ -33,6 +42,15 @@ def _read_idx3_images(file_path: Path) -> np.ndarray:
 
 
 def _read_idx1_labels(file_path: Path) -> np.ndarray:
+    """
+    Read a gzip-compressed IDX1 file and return its labels.
+
+    Args:
+        file_path (Path): Path to the IDX1 label file.
+
+    Returns:
+        np.ndarray: Label array with shape (N,) and dtype uint8.
+    """
     with gzip.open(file_path, "rb") as f:
         _, n_labels = struct.unpack(">II", f.read(8))
         labels = np.frombuffer(f.read(), dtype=np.uint8)
@@ -40,7 +58,15 @@ def _read_idx1_labels(file_path: Path) -> np.ndarray:
 
 
 def load_raw_dataset(data_dir: Path | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Load the four original gzip files. Returns (X_train, y_train, X_test, y_test)."""
+    """
+    Load the four original gzip files.
+
+    Args:
+        data_dir (Path | None): Directory containing the .gz files; if None, the default data directory is used.
+
+    Returns:
+        tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: X_train, y_train, X_test, and y_test.
+    """
     if data_dir is None:
         base_dir = Path(__file__).resolve().parent.parent
         primary = base_dir / "data" / "raw"
@@ -71,7 +97,15 @@ def load_raw_dataset(data_dir: Path | None = None) -> tuple[np.ndarray, np.ndarr
 
 
 def load_full_dataset(data_dir: Path | None = None) -> tuple[np.ndarray, np.ndarray]:
-    """Combine the original 60,000 train and 10,000 test samples into one array."""
+    """
+    Combine the original train and test samples into one dataset.
+
+    Args:
+        data_dir (Path | None): Directory containing the raw .gz files; if None, the default location is used.
+
+    Returns:
+        tuple[np.ndarray, np.ndarray]: Combined image array X and label array y.
+    """
     X_tr, y_tr, X_te, y_te = load_raw_dataset(data_dir)
     return np.concatenate([X_tr, X_te]), np.concatenate([y_tr, y_te])
 
@@ -84,7 +118,20 @@ def get_or_create_splits(
     test_size: float = 0.15,
     seed: int = 42,
 ) -> dict:
-    """Load the stratified train/val/test split from splits.json, or create and save it."""
+    """
+    Load the stratified train/val/test split from splits.json, or create and save it.
+
+    Args:
+        y (np.ndarray): Label array used to build stratified splits.
+        splits_file (Path | None): Path to the JSON split file; if None, the default path is used.
+        train_size (float): Fraction of samples assigned to the training split.
+        val_size (float): Fraction of samples assigned to the validation split.
+        test_size (float): Fraction of samples assigned to the test split.
+        seed (int): Random seed for reproducibility.
+
+    Returns:
+        dict: Split indices under train_indices, val_indices, and test_indices, plus metadata.
+    """
     if splits_file is None:
         splits_file = Path(__file__).resolve().parent.parent / "data" / "splits.json"
 
@@ -126,7 +173,17 @@ def get_or_create_splits(
 
 
 def shift_image(img: np.ndarray, shift_x: int, shift_y: int) -> np.ndarray:
-    """Shift a 2D image by (shift_x, shift_y) pixels, filling the borders with 0."""
+    """
+    Shift a 2D image by (shift_x, shift_y) pixels, filling the borders with 0.
+
+    Args:
+        img (np.ndarray): 2D input image.
+        shift_x (int): Number of pixels to shift along the horizontal axis.
+        shift_y (int): Number of pixels to shift along the vertical axis.
+
+    Returns:
+        np.ndarray: Shifted image with the same shape as img.
+    """
     shifted = np.zeros_like(img)
     rows, cols = img.shape
 
@@ -140,7 +197,16 @@ def shift_image(img: np.ndarray, shift_x: int, shift_y: int) -> np.ndarray:
 
 
 def augment_image(img: np.ndarray, rng: np.random.Generator) -> np.ndarray:
-    """Random horizontal flip plus a shift of up to 2 pixels in each direction."""
+    """
+    Apply a random horizontal flip plus a shift of up to 2 pixels in each direction.
+
+    Args:
+        img (np.ndarray): 2D input image.
+        rng (np.random.Generator): Random number generator used for the augmentation.
+
+    Returns:
+        np.ndarray: Augmented image with the same shape as img.
+    """
     out = img.copy()
     if rng.random() > 0.5:
         out = np.fliplr(out)
@@ -161,7 +227,17 @@ def generate_augmented_training_batch(
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Append augmented copies of a random fraction of the training images.
+
     Only apply this to the training subset to avoid data leakage.
+
+    Args:
+        X_train_3d (np.ndarray): Training images with shape (N, 28, 28).
+        y_train (np.ndarray): Training labels.
+        augmentation_ratio (float): Fraction of training images to augment.
+        seed (int): Random seed for reproducibility.
+
+    Returns:
+        tuple[np.ndarray, np.ndarray]: Augmented images and their corresponding labels.
     """
     rng = np.random.default_rng(seed)
     n_augment = int(len(X_train_3d) * augmentation_ratio)

@@ -57,16 +57,21 @@ Workshop_1/
 │   ├── features.py             # Z-score scaling and dimensionality reduction with PCA
 │   └── baselines.py            # Training, testing and base models exportation
 ├── notebooks/
-│   └── SupervisedLearning.ipynb # Notebook with the complete EDA, visualizations and analysi
+│   ├── eda.ipynb                # Exploratory data analysis and visualizations
+│   └── model_results_analysis.ipynb # Model comparison, per-class metrics and confusion matrices
 ├── data/
 │   ├── raw/                    # Compressed original binary files .gz
 │   └── splits.json             # Stratified indexes of train (49k), val (10.5k), test (10.5k)
 ├── checkpoints/
-│   ├── Logistic_Regression.joblib
-│   ├── Random_Forest.joblib
-│   └── Hist_Gradient_Boosting.joblib
+│   ├── no_aug_no_pca/          # Original training split, 784 scaled features
+│   │   ├── Logistic_Regression.joblib
+│   │   ├── Random_Forest.joblib
+│   │   └── Hist_Gradient_Boosting.joblib
+│   ├── no_aug_pca/             # Original training split, PCA components
+│   ├── aug_no_pca/             # Augmented training split, 784 scaled features
+│   └── aug_pca/                # Augmented training split, PCA components
 ├── runs/
-│   └── results.json            # Detailed metricsMétricas detalladas, reportes y matrices de confusión
+│   └── results.json            # Detailed metrics, per-class reports and confusion matrices
 ├── dataset_info.py              # Script CLI para verificación de integridad y estadísticas
 ├── pyproject.toml              # Dependencies definition and Poetry configuration
 ├── poetry.lock                 # Dependencies blocking
@@ -114,10 +119,22 @@ python dataset_info.py
 ```
 
 ### Step 2: Pipeline execution and training base models
-The script `src/baselines.py` automatice data loading, the reading or generation of `data/splits.json`, the standard scaling (`StandardScaler`), projection with PCA (95% of explained variance, reducing to 256 dimensions), the adjustment of the 3 classifiers and metrics calculus:
+The script `src/baselines.py` automates data loading, the reading or generation of `data/splits.json`, the optional augmentation of the training split (horizontal flips and small pixel shifts), standard scaling (`StandardScaler`), and the adjustment of the 3 classifiers. Each model is trained and evaluated four times to compare both design choices independently:
+
+| Variant | Training data | Feature representation |
+| :--- | :--- | :--- |
+| `no_aug_no_pca` | Original 49,000 images | 784 scaled features |
+| `no_aug_pca` | Original 49,000 images | PCA components (95% explained variance) |
+| `aug_no_pca` | 49,000 originals + 20% augmented copies (58,800) | 784 scaled features |
+| `aug_pca` | 49,000 originals + 20% augmented copies (58,800) | PCA components (95% explained variance) |
+
+Augmentation is applied only to the training split, and the scaler/PCA are fitted on that same training split, so validation and test remain untouched by augmentation and no data leaks across splits.
+
 ```bash
 python -m src.baselines
 ```
+
+The run writes detailed metrics, the four-way comparison table, and validation/test deltas to `runs/results.json`, and each fitted model to its own folder under `checkpoints/`: `no_aug_no_pca/`, `no_aug_pca/`, `aug_no_pca/`, and `aug_pca/`.
 
 ### Step 3: Stratified Partition (Train / Val / Test)
 Based on the 70,000 images, a reproductible division was registered on `data/splits.json`:
@@ -128,7 +145,7 @@ Based on the 70,000 images, a reproductible division was registered on `data/spl
 The imbalance ratio is exactly 1.0, which avoid any bias by category frequency.
 
 ### Step 4: Exploration in Jupyter Notebook
-To visualize the exploratory data analysis (EDA), acumulative variance of components and confusion matrixes, refer to `notebooks/eda.ipynb`
+To visualize the exploratory data analysis (EDA), refer to `notebooks/eda.ipynb`.
 
-### Step 5: Model Training
-To train the different models, refer to the following files: `notebooks/MulticlassLogisticRegression`, `notebooks/RandomForest` and `notebooks/HistGradientBoosting`
+### Step 5: Model results analysis
+Open `notebooks/model_results_analysis.ipynb` to analyze `runs/results.json`. It produces aggregate metric comparisons for the four augmentation/PCA settings, per-class precision/recall/F1, augmentation and PCA effect charts, training-time analysis, and normalized confusion matrices for each model and feature variant.

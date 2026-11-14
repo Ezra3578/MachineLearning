@@ -33,6 +33,25 @@ class FashionMNISTDataset:
         output_dir: str | Path | None = None,
         splits_path: str | Path | None = None,
     ) -> None:
+        """
+        Initialize the dataset configuration and preprocessing objects.
+
+        Args:
+            seed (int): Random seed for reproducibility.
+            train_size (float): Fraction of samples assigned to the training split.
+            val_size (float): Fraction of samples assigned to the validation split.
+            test_size (float): Fraction of samples assigned to the test split.
+            augmentation_ratio (float): Fraction of training images to augment per class.
+            use_pca (bool): Whether to apply PCA after scaling.
+            pca_variance (float): Variance ratio retained by PCA.
+            scaling (str): Scaling strategy: "standard", "minmax", or "none".
+            reuse_splits (bool): Whether to reuse an existing splits.json file.
+            output_dir (str | Path | None): Directory where arrays and metadata are saved.
+            splits_path (str | Path | None): Path to the split indices JSON file.
+
+        Returns:
+            None: This method initializes the instance in place.
+        """
         root = Path(__file__).resolve().parents[1]
         self.output_dir = Path(output_dir) if output_dir else root / "data" / "preprocessed"
         self.splits_path = Path(splits_path) if splits_path else root / "data" / "splits.json"
@@ -66,7 +85,15 @@ class FashionMNISTDataset:
         self.arrays: dict[str, np.ndarray] = {}
 
     def load_data(self) -> tuple[np.ndarray, np.ndarray]:
-        """Combine the original train and test sets into 70,000 samples."""
+        """
+        Combine the original train and test sets into 70,000 samples.
+
+        Args:
+            None
+
+        Returns:
+            tuple[np.ndarray, np.ndarray]: Image array X and label array y.
+        """
         X_train, y_train, X_test, y_test = load_raw_dataset()
         X = np.concatenate((X_train, X_test))
         y = np.concatenate((y_train, y_test)).astype(np.int64)
@@ -78,7 +105,15 @@ class FashionMNISTDataset:
         return X, y
 
     def split_data(self, y: np.ndarray) -> list[np.ndarray]:
-        """Load saved split indices or create a stratified train/val/test split."""
+        """
+        Load saved split indices or create a stratified train/val/test split.
+
+        Args:
+            y (np.ndarray): Label array used for stratification.
+
+        Returns:
+            list[np.ndarray]: Train, validation, and test index arrays.
+        """
         keys = ("train_indices", "val_indices", "test_indices")
         n = len(y)
         n_train = round(n * self.train_size)
@@ -125,7 +160,16 @@ class FashionMNISTDataset:
         return splits
 
     def augment(self, X: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        """Append augmented copies of training images, balanced per class."""
+        """
+        Append augmented copies of training images, balanced per class.
+
+        Args:
+            X (np.ndarray): Training images with shape (N, 28, 28).
+            y (np.ndarray): Training labels.
+
+        Returns:
+            tuple[np.ndarray, np.ndarray]: Original plus augmented images and labels.
+        """
         if self.augmentation_ratio == 0:
             return X, y
 
@@ -151,6 +195,15 @@ class FashionMNISTDataset:
         )
 
     def run(self) -> dict[str, np.ndarray]:
+        """
+        Run the full preprocessing pipeline and save the resulting arrays.
+
+        Args:
+            None
+
+        Returns:
+            dict[str, np.ndarray]: Processed arrays grouped by split and representation.
+        """
         X, y = self.load_data()
         train_idx, val_idx, test_idx = self.split_data(y)
 
@@ -193,6 +246,15 @@ class FashionMNISTDataset:
         return self.arrays
 
     def save(self, y_all: np.ndarray) -> None:
+        """
+        Save the processed arrays, metadata, and fitted preprocessing objects.
+
+        Args:
+            y_all (np.ndarray): All labels before augmentation, used for metadata counts.
+
+        Returns:
+            None
+        """
         self.output_dir.mkdir(parents=True, exist_ok=True)
         for name, array in self.arrays.items():
             np.save(self.output_dir / f"{name}.npy", array)
