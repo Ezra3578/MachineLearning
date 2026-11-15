@@ -1,7 +1,7 @@
 # Workshop 3 — Reinforcement Learning (DQN) for Fashion-MNIST
 
 **Team 3** — Computer vision and object recognition.
-Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020068) · Juan Andrés Jiménez Palomino (20221020087)
+Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020098) · Juan Andrés Jiménez Palomino (20221020087)
 
 RL alternative to the supervised models of Workshop 1/2: a DQN agent learns to
 classify Fashion-MNIST images formulated as a sequential decision process

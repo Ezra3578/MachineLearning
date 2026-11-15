@@ -1,7 +1,7 @@
 # Workshop 2 — Deep Learning (CNNs) for Fashion-MNIST
 
 **Team 3** — Computer vision and object recognition.
-Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020068) · Juan Andrés Jiménez Palomino (20221020087)
+Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020098) · Juan Andrés Jiménez Palomino (20221020087)
 
 This workshop implements, trains, evaluates and checkpoints deep convolutional neural
 networks for Fashion-MNIST image classification, and compares them against the Workshop 1
