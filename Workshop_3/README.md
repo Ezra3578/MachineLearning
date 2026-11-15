@@ -9,21 +9,19 @@ classify Fashion-MNIST images formulated as a sequential decision process
 reward `+1/-1`). Same 70/15/15 split (seed 42) and normalization as Workshop 2,
 so metrics stay comparable.
 
-> El documento de formulacion MDP vive en `docs/mdp_spec.md`; el reporte
-> `group3_workshop3.pdf` se genera desde `docs/group3_workshop3.tex`
-> (`pdflatex` dos pasadas, ejecutado desde `docs/`).
+> El documento de formulacion MDP vive en `docs/mdp_spec.md`. El reporte LaTeX
+> vive en el repositorio de documentacion `tex-team3-machine-learning/Workshop_3`
+> (`main.tex` + `secciones/` + `images/`); el PDF compilado llega a este repo
+> como `Workshop3.pdf` via el workflow `sync-pdfs.yml`.
 
-## Results (placeholder — updated after final runs + W1/W2 closure)
+## Results
 
 | Model | Test accuracy | Macro F1 | Notes |
 |---|---|---|---|
-| HistGradientBoosting (W1 best) | 87.48% | 0.8740 | TODO(W1): confirmar + resto de modelos |
-| SmallCNN (W2) | 93.05% | 0.9302 | a confirmar con `runs/test_metrics.json` |
-| ResNet-18 (W2) | 94.94% | 0.9494 | a confirmar con `runs/resnet18/test_metrics.json` |
-| **DQN (W3, this work)** | TODO | TODO | return-derived; ver `runs/workshop3/test_metrics.json` |
-
-Los unicos valores a completar despues estan centralizados en
-`src/compare_placeholders.py` (constantes + TODOs).
+| HistGradientBoosting (W1 best) | 87.48% | 0.8740 | mejor baseline W1 |
+| SmallCNN (W2) | 93.05% | 0.9302 | `runs/test_metrics.json` |
+| ResNet-18 (W2) | 94.94% | 0.9494 | `runs/resnet18/test_metrics.json` |
+| **DQN (W3, this work)** | 85.20% | n/a | return-derived (reward ±1); ver `runs/workshop3/test_metrics.json` |
 
 ## Structure
 
@@ -106,5 +104,5 @@ python -m src.evaluate --checkpoint checkpoints/agent_best.pt --plot
 | `src/evaluate.py` + test | `src/evaluate.py`, `runs/workshop3/test_metrics.json` |
 | `checkpoints/agent_best.pt` | `checkpoints/` |
 | `runs/workshop3/` logs | CSV + TensorBoard + PNGs |
-| Comparacion W1/W2 (pendiente cierre) | `src/compare_placeholders.py` |
-| Reporte PDF | `docs/group3_workshop3.tex` -> `group3_workshop3.pdf` |
+| Comparacion W1/W2 | `src/compare_placeholders.py`, `runs/workshop3/test_metrics.json` |
+| Reporte PDF | `tex-team3-machine-learning/Workshop_3` -> `Workshop3.pdf` (via sync-pdfs) |
