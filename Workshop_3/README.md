@@ -11,16 +11,16 @@ so metrics stay comparable.
 
 > El documento de formulacion MDP vive en `docs/mdp_spec.md`. El reporte LaTeX
 > vive en el repositorio de documentacion `tex-team3-machine-learning/Workshop_3`
-> (`main.tex` + `secciones/` + `images/`); el PDF compilado llega a este repo
-> como `Workshop3.pdf` via el workflow `sync-pdfs.yml`.
+> (`main.tex` + `secciones/` + `images/`); el PDF compilado se copia a este repo
+> como `group3_workshop3.pdf` (nombre que exige la guia).
 
 ## Results
 
 | Model | Test accuracy | Macro F1 | Notes |
 |---|---|---|---|
 | HistGradientBoosting (W1 best) | 87.48% | 0.8740 | mejor baseline W1 |
-| SmallCNN (W2) | 93.05% | 0.9302 | `runs/test_metrics.json` |
-| ResNet-18 (W2) | 94.94% | 0.9494 | `runs/resnet18/test_metrics.json` |
+| SmallCNN (W2) | 93.05% | 0.9302 | `../Workshop_2/runs/test_metrics.json` |
+| ResNet-18 (W2) | 94.94% | 0.9494 | `../Workshop_2/runs/resnet18/test_metrics.json` |
 | **DQN (W3, this work)** | 85.20% | n/a | return-derived (reward ±1); ver `runs/workshop3/test_metrics.json` |
 
 ## Structure
@@ -105,4 +105,4 @@ python -m src.evaluate --checkpoint checkpoints/agent_best.pt --plot
 | `checkpoints/agent_best.pt` | `checkpoints/` |
 | `runs/workshop3/` logs | CSV + TensorBoard + PNGs |
 | Comparacion W1/W2 | `src/compare_placeholders.py`, `runs/workshop3/test_metrics.json` |
-| Reporte PDF | `tex-team3-machine-learning/Workshop_3` -> `Workshop3.pdf` (via sync-pdfs) |
+| Reporte PDF | `tex-team3-machine-learning/Workshop_3` -> `group3_workshop3.pdf` |

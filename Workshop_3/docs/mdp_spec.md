@@ -22,8 +22,11 @@ sera mas sample-efficient: la comparacion es el punto cientifico del workshop.
 
 - Observacion: imagen Fashion-MNIST 28x28 en escala de grises, normalizada con
   las estadisticas globales del Workshop 1/2: `mean = 0.2860`, `std = 0.3530`.
-- Representacion para la red: tensor `float32` de forma `(1, 28, 28)` en `[0,1]`
-  normalizado; `observation_space = Box(low=0, high=1, shape=(1,28,28))`.
+- Representacion para la red: tensor `float32` de forma `(1, 28, 28)`. Los pixeles
+  en [0,255] se escalan a [0,1] y luego se estandarizan con las estadisticas
+  globales (mean = 0.2860, std = 0.3530).
+- `observation_space = Box(low=-5, high=5, shape=(1, 28, 28), dtype=float32)`
+  (contiene con margen los valores estandarizados; ver `src/env.py`).
 - Sin apilado temporal ni historial: el estado es Markoviano por construccion
   (muestreo i.i.d.), `state_dim = 784` pixeles efectivos.
 - Split usado: el mismo 70/15/15 estratificado con `seed=42` de Workshop 2, para
