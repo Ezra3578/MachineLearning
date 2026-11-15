@@ -10,24 +10,24 @@ protocol, seed 42) and the W1 description (Fashion-MNIST, F-score focus).
 
 from __future__ import annotations
 
-# TODO(W1): reemplazar con las metricas finales del notebook
-# Workshop_1/code/SupervisedLearning.ipynb (accuracy, macro-F1 por modelo).
+# TODO(W1): replace with the final notebook metrics
+# Workshop_1/code/SupervisedLearning.ipynb (accuracy, macro-F1 per model).
 W1_RESULTS: dict[str, dict[str, float | None]] = {
-    # Mejor baseline tradicional conocido hasta ahora (HistGradientBoosting).
+    # Best traditional baseline known so far (HistGradientBoosting).
     "HistGradientBoosting (W1 best)": {"accuracy": 0.8748, "f1_macro": 0.8740, "roc_auc_ovr": None},
-    # TODO(W1): agregar filas finales para RandomForest, XGBoost y K-Means.
+    # TODO(W1): add final rows for RandomForest, XGBoost and K-Means.
     "RandomForest (W1)": {"accuracy": None, "f1_macro": None, "roc_auc_ovr": None},  # TODO(W1)
     "XGBoost (W1)": {"accuracy": None, "f1_macro": None, "roc_auc_ovr": None},  # TODO(W1)
 }
 
-# TODO(W2): confirmar con runs/test_metrics.json y runs/resnet18/test_metrics.json.
+# TODO(W2): confirm against runs/test_metrics.json and runs/resnet18/test_metrics.json.
 W2_RESULTS: dict[str, dict[str, float | None]] = {
     "SmallCNN (W2)": {"accuracy": 0.9305, "f1_macro": 0.9302, "roc_auc_ovr": 0.9961},
     "ResNet-18 (W2)": {"accuracy": 0.9494, "f1_macro": 0.9494, "roc_auc_ovr": 0.9979},
 }
 
-# RL no tiene accuracy supervisada directa: se deriva del retorno con reward ±1.
-# accuracy = (mean_return + max_steps) / (2 * max_steps). Ver src/evaluate.py.
+# RL has no direct supervised accuracy: it derives from the return with ±1 reward.
+# accuracy = (mean_return + max_steps) / (2 * max_steps). See src/evaluate.py.
 RL_METRIC_HELP = "RL accuracy derives from mean episode return; not directly comparable to supervised epochs — see sample-efficiency plot."
 
 TODO_W1_W2 = [

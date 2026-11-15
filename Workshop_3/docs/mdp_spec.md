@@ -1,71 +1,71 @@
 # MDP Specification — Workshop 3 (RL on Fashion-MNIST)
 
-> Codigo-artefacto del punto 1 de la guia (`MDP Formulation Document`).
-> El reporte PDF (`groupN_workshop3.pdf`) NO se genera aqui por peticion del usuario.
+> Code artifact for item 1 of the guide (`MDP Formulation Document`).
 
 ## 1. Problem Statement
 
-El agente RL resuelve clasificacion de Fashion-MNIST (10 clases) como proceso de
-decision secuencial: en cada paso observa una imagen y elige la etiqueta predicha.
-Se usa RL como enfoque alternativo/complementario a los modelos supervisados de
-Workshop 1 (Random Forest / XGBoost / HGB) y Workshop 2 (SmallCNN / ResNet-18).
+The RL agent solves Fashion-MNIST classification (10 classes) as a sequential
+decision process: at each step it observes one image and chooses the predicted
+label. RL is used as an alternative/complementary approach to the supervised
+models of Workshop 1 (Random Forest / XGBoost / HGB) and Workshop 2
+(SmallCNN / ResNet-18).
 
-RL es apropiado aqui porque: (a) la tarea admite formularse como decisiones
-secuenciales donde cada prediccion recibe una recompensa inmediata verificable;
-(b) disponemos de un simulador barato (muestreo i.i.d. del dataset); (c) permite
-estudiar exploracion vs. explotacion, reward shaping y sample-efficiency frente al
-aprendizaje supervisado. Se reporta honestamente que el entorno es un bandit
-contextual (transicion independiente de la accion), por lo que el supervisado
-sera mas sample-efficient: la comparacion es el punto cientifico del workshop.
+RL is appropriate here because: (a) the task can be formulated as sequential
+decisions where every prediction receives an immediate, verifiable reward;
+(b) we have a cheap simulator (i.i.d. sampling from the dataset); (c) it exposes
+exploration vs. exploitation, reward shaping and sample-efficiency against
+supervised learning. We honestly report that the environment is a contextual
+bandit (transition independent of the action), so supervised learning will be
+more sample-efficient: the comparison is the scientific point of the workshop.
 
 ## 2. State Space
 
-- Observacion: imagen Fashion-MNIST 28x28 en escala de grises, normalizada con
-  las estadisticas globales del Workshop 1/2: `mean = 0.2860`, `std = 0.3530`.
-- Representacion para la red: tensor `float32` de forma `(1, 28, 28)`. Los pixeles
-  en [0,255] se escalan a [0,1] y luego se estandarizan con las estadisticas
-  globales (mean = 0.2860, std = 0.3530).
+- Observation: 28x28 grayscale Fashion-MNIST image, normalized with the global
+  Workshop 1/2 statistics (`mean = 0.2860`, `std = 0.3530`).
+- Network representation: `float32` tensor of shape `(1, 28, 28)`. Pixels in
+  [0,255] are scaled to [0,1] and then standardized with the global statistics.
 - `observation_space = Box(low=-5, high=5, shape=(1, 28, 28), dtype=float32)`
-  (contiene con margen los valores estandarizados; ver `src/env.py`).
-- Sin apilado temporal ni historial: el estado es Markoviano por construccion
-  (muestreo i.i.d.), `state_dim = 784` pixeles efectivos.
-- Split usado: el mismo 70/15/15 estratificado con `seed=42` de Workshop 2, para
-  metricas comparables.
+  (safely contains the standardized values; see `src/env.py`).
+- No temporal stacking and no history: the state is Markovian by construction
+  (i.i.d. sampling), `state_dim = 784` effective pixels.
+- Split used: the same stratified 70/15/15 split with `seed=42` from Workshop 2,
+  so metrics stay comparable.
 
 ## 3. Action Set
 
-- Discreto, `action_space = Discrete(10)`, enumeracion identica a `CLASS_NAMES`:
+- Discrete, `action_space = Discrete(10)`, enumeration identical to
+  `CLASS_NAMES`:
   `0 T-shirt/top, 1 Trouser, 2 Pullover, 3 Dress, 4 Coat, 5 Sandal, 6 Shirt,`
   `7 Sneaker, 8 Bag, 9 Ankle boot`.
-- Interpretacion: la accion `a_t` ES la etiqueta predicha para `s_t`.
-- Por ser discreto y pequeno se justifica DQN (guia, seccion Agent Algorithm).
+- Interpretation: action `a_t` IS the predicted label for `s_t`.
+- Being discrete and small justifies DQN (guide, Agent Algorithm section).
 
 ## 4. Transition Dynamics
 
-- `s_{t+1} = f(s_t, a_t) = sample_uniform(split)`: la siguiente imagen se muestrea
-  uniformemente del split activo, independientemente de la accion tomada.
-- Determinista dado el indice muestreado; estocastica desde la perspectiva del
-  agente (i.i.d.). No hay dinamica latente ni memoria entre pasos.
-- Consecuencia: `gamma` tiene efecto limitado (recompensa inmediata domina); se
-  barre `gamma in {0.90, 0.95, 0.99}` igualmente como pide la guia para verificarlo
-  empiricamente.
+- `s_{t+1} = f(s_t, a_t) = sample_uniform(split)`: the next image is sampled
+  uniformly from the active split, regardless of the action taken.
+- Deterministic given the sampled index; stochastic from the agent's
+  perspective (i.i.d.). No latent dynamics and no memory between steps.
+- Consequence: `gamma` has a limited effect (immediate reward dominates); we
+  still sweep `gamma in {0.90, 0.95, 0.99}` as the guide requests, to verify it
+  empirically.
 
 ## 5. Reward Function
 
-- Por defecto (`reward_mode="plus_minus"`, densa y simetrica):
-  `r_t = +1` si `a_t == y_t`, `-1` en caso contrario.
-- Retorno de episodio con `N = max_steps = 100`:
+- Default (`reward_mode="plus_minus"`, dense and symmetric):
+  `r_t = +1` if `a_t == y_t`, `-1` otherwise.
+- Episode return with `N = max_steps = 100`:
   `G in [-100, 100]`; `accuracy = (G + N) / (2N)`.
-- Modos alternos (`--reward-mode`): `zero_one` (`+1/0`, util para comparar contra
-  accuracy directa) y `sparse` (0 en pasos intermedios, `+#aciertos` al final;
-  solo para el analisis de sparse-rewards de la guia, converge lento).
-- Horizonte relevante: retorno acumulado del episodio (largo plazo = suma de
-  decisiones); cada paso tambien es interpretable (corto plazo = acierto/fallo).
+- Alternative modes (`--reward-mode`): `zero_one` (`+1/0`, useful to compare
+  against direct accuracy) and `sparse` (0 at intermediate steps,
+  `+#correct` at the end; only for the guide's sparse-reward analysis, slow).
+- Relevant horizon: the accumulated episode return (long term = sum of
+  decisions); each step is also interpretable on its own (short term = hit/miss).
 
 ## 6. Episode Termination
 
-- `truncated = True` cuando `t == max_steps` (defecto 100). `terminated` nunca se
-  activa (no hay estado absorbente de exito/fracaso).
-- La terminacion equivale a "presupuesto de clasificaciones por episodio" y hace
-  comparable el retorno entre episodios. El exito de la tarea se mide por retorno
-  medio y accuracy, no por terminacion temprana.
+- `truncated = True` when `t == max_steps` (default 100). `terminated` never
+  fires (there is no absorbing success/failure state).
+- Termination equals a "classification budget per episode" and keeps returns
+  comparable across episodes. Task success is measured by mean return and
+  accuracy, not by early termination.
