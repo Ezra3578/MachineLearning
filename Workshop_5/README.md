@@ -84,4 +84,4 @@ python -m src.augment_and_retrain --vanilla-ckpt checkpoints/gan_vanilla_best.pt
 | Data augmentation experiment (3 conditions) | `src/augment_and_retrain.py` |
 | Best generator checkpoints | `checkpoints/gan_vanilla_best.pt`, `checkpoints/gan_wgan_best.pt` |
 | Training logs and generated samples | `runs/workshop5/` |
-| Report (PDF) | `tex-team3-machine-learning/Workshop_5/main.pdf` (`group3_workshop5.pdf`) |
+| Report (PDF) | [Workshop 5 report](Workshop5.pdf) |

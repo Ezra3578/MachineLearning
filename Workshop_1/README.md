@@ -1,5 +1,7 @@
 # Workshop 1: Data Preparation & Supervised Learning Base Models
 
+[Workshop 1 report (PDF)](Workshop1.pdf)
+
 ## 1. Dataset Description (Fashion-MNIST)
 
 Fashion-MNIST is a dataset devolped by Zalando Research composed of 70,000 monocromatic images in a integer format of 8 bits (`uint8`), with a uniform resolution of 28x28 pixels (784 variables per sample). The dataset is divided in 10 categories of clothing products. It is originally distributed with 60,000 samples for training and 10,000 samples for testing.

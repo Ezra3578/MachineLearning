@@ -126,4 +126,4 @@ python -m src.evaluate --checkpoint checkpoints/model_best.pt
 | Training logs & learning curves | `runs/`, `runs/*/tensorboard/` |
 | Qualitative analysis | `src/gradcam.py`, `notebooks/GradCAM_Analysis.ipynb` |
 | Documented training flow | `notebooks/Training_Pipeline.ipynb` |
-| Report (PDF) |  `Workshop2.pdf` |
+| Report (PDF) | [Workshop 2 report](Workshop2.pdf) |

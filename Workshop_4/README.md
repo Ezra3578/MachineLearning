@@ -70,4 +70,4 @@ python -m src.analyze_latent --ae-ckpt checkpoints/ae_best.pt --vae-ckpt checkpo
 | Latent space visualization (t-SNE, UMAP, Silhouette vs W2) | `src/analyze_latent.py` |
 | Best checkpoints | `checkpoints/ae_best.pt`, `checkpoints/vae_best.pt` |
 | Training logs and figures | `runs/workshop4/` |
-| Report (PDF) | `tex-team3-machine-learning/Workshop_4/main.pdf` (`group3_workshop4.pdf`) |
+| Report (PDF) | [Workshop 4 report](Workshop4.pdf) |

@@ -98,4 +98,4 @@ python -m src.evaluate --checkpoint checkpoints/agent_best.pt --plot
 | `checkpoints/agent_best.pt` | `checkpoints/` |
 | `runs/workshop3/` logs | CSV + TensorBoard + PNGs |
 | W1/W2 comparison | `src/compare_placeholders.py`, `runs/workshop3/test_metrics.json` |
-| Report (PDF) | `group3_workshop3.pdf` |
+| Report (PDF) | [Workshop 3 report](group3_workshop3.pdf) |

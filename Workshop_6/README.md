@@ -51,7 +51,6 @@ Workshop_6/
 │   └── device.py                 # auto device selection (CUDA -> MPS -> DirectML -> CPU)
 ├── checkpoints/                  # <run>_best.pt per configuration
 ├── runs/workshop6/               # train logs, test metrics, figures, reports
-├── docs/                         # group3_medical_final_report.tex / .pdf
 └── data/                         # PneumoniaMNIST (auto-downloaded, gitignored)
 
 ```
@@ -97,6 +96,6 @@ DirectML, then CPU); results land in `runs/workshop6/`
 `training_curves.png`, `confusion_matrices.png`).
 
 ## Report
-
-`docs/group3_medical_final_report.pdf` (from `docs/group3_medical_final_report.tex`,
-`pdflatex` twice from `docs/`).
+| Requirement | File |
+|---|---|
+| Report (PDF) | [Workshop 6 report](Workshop6.pdf) |
