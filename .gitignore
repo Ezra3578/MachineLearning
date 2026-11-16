@@ -262,6 +262,13 @@ build/
 # ==============================
 
 .vscode/
+
+# ==============================
+# Other
+# ==============================
+
+Workshop_1_guide.md
+*.joblib
 .venv-gpu/
 
 # Notebook demo artifacts
