@@ -267,6 +267,9 @@ build/
 # Notebook demo artifacts
 notebook_demo/
 
+# Datasets downloaded at runtime by the notebooks (torchvision caches)
+Workshop_*/notebooks/data/
+
 # Heavy run artifacts (model_best.pt is the deliverable)
 Workshop_2/checkpoints/resnet18/model_last.pt
 Workshop_2/runs/resnet18/train_stdout.log
