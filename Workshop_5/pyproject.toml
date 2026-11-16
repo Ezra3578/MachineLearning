@@ -1,0 +1,23 @@
+[project]
+name = "team3-workshop5"
+version = "0.1.0"
+description = "Workshop 5 — Generative Adversarial Networks (Vanilla GAN & WGAN-GP) for Fashion-MNIST"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "scikit-learn>=1.3",
+    "matplotlib>=3.7",
+    "tqdm>=4.65",
+    "tensorboard>=2.14",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["src"]

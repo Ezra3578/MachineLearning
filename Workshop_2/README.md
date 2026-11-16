@@ -1,11 +1,10 @@
-# Workshop 2 — Deep Learning (CNNs) for Fashion-MNIST
+# Workshop 2. CNNs for Fashion-MNIST
 
-**Team 3** — Computer vision and object recognition.
-Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020068) · Juan Andrés Jiménez Palomino (20221020087)
+Team 3 (computer vision and object recognition)
 
-This workshop implements, trains, evaluates and checkpoints deep convolutional neural
-networks for Fashion-MNIST image classification, and compares them against the Workshop 1
-traditional baselines on the same 70/15/15 split.
+Jhojan Stiven Aragón Ramírez (20221020060), Santiago Reyes Gómez (20221020068), and Juan Andrés Jiménez Palomino (20221020087)
+
+We trained a compact CNN from scratch and fine-tuned an ImageNet-pretrained ResNet-18. We evaluated both checkpoints on the same 70/15/15 Fashion-MNIST split as the classical Workshop 1 baselines.
 
 ## Results
 
@@ -15,10 +14,9 @@ traditional baselines on the same 70/15/15 split.
 | SmallCNN (from scratch, 30 epochs) | 93.05% | 0.9302 | 0.9961 |
 | **ResNet-18 (ImageNet transfer, 20 epochs)** | **94.94%** | **0.9494** | **0.9979** |
 
-The complete comparison (all three W1 baselines versus both deep models) is included in the
-Workshop 2 report of the LaTeX repository (`tex-team3-machine-learning` → `Workshop_2/main.pdf`).
+The [Workshop 2 report](Workshop2.pdf) compares both CNNs with all three Workshop 1 baselines. Its source is in `Workshop_2/` in `tex-team3-machine-learning`.
 
-## Structure 
+## Files
 
 ```
 Workshop_2/
@@ -49,12 +47,11 @@ python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\act
 pip install -e .
 ```
 
-Requirements: Python ≥ 3.10, PyTorch ≥ 2.0, torchvision ≥ 0.15.
+Requires Python ≥ 3.10, PyTorch ≥ 2.0, and torchvision ≥ 0.15.
 
 ### Optional GPU on Windows (AMD DirectML)
 
-Without an NVIDIA GPU, a separate environment with `torch-directml` trains the ResNet-18 on
-any DirectX 12 GPU (it pins `torch==2.4.1`):
+On Windows, use a separate environment for DirectML training on a compatible DirectX 12 GPU. The `torch-directml` environment uses `torch==2.4.1`.
 
 ```powershell
 uv venv .venv-gpu --python 3.11
@@ -82,9 +79,7 @@ python -m src.evaluate --checkpoint checkpoints/resnet18/model_best.pt --runs-di
 python -m src.test_model --checkpoint checkpoints/model_best.pt
 ```
 
-> Use `--checkpoint-dir` / `--runs-dir` subfolders per model so runs do not overwrite each
-> other. `checkpoints/model_best.pt` is reserved for the final selected model (currently the
-> SmallCNN; the ResNet-18 wins on test accuracy).
+Use `--checkpoint-dir` and `--runs-dir` to keep each model's outputs in its own directory. The SmallCNN checkpoint is `checkpoints/model_best.pt`. ResNet-18 had the highest validation macro F1, and its checkpoint is `checkpoints/resnet18/model_best.pt`.
 
 ## Protocol
 
@@ -111,9 +106,7 @@ python -m src.test_model --checkpoint checkpoints/model_best.pt
 
 ## Reproducibility
 
-All runs are seeded (`--seed 42`), splits are cached in `data/splits.json`, and the full
-training configuration is stored inside every checkpoint. Reported metrics can be
-regenerated with:
+The commands below reproduce the training setup with `--seed 42`. The data loader caches the split in `data/splits.json`, and each checkpoint stores the training configuration.
 
 ```bash
 python -m src.train --model smallcnn --epochs 30 --seed 42
