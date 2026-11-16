@@ -1,15 +1,12 @@
-# Workshop 3 — Reinforcement Learning (DQN) for Fashion-MNIST
+# Workshop 3. Reinforcement learning for Fashion-MNIST
 
-**Team 3** — Computer vision and object recognition.
-Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020098) · Juan Andrés Jiménez Palomino (20221020087)
+Team 3 (computer vision and object recognition)
 
-RL alternative to the supervised models of Workshop 1/2: a DQN agent learns to
-classify Fashion-MNIST images formulated as a sequential decision process
-(multi-step episodes of `N=100` i.i.d. images, action = predicted class,
-reward `+1/-1`). Same 70/15/15 split (seed 42) and normalization as Workshop 2,
-so metrics stay comparable.
+Jhojan Stiven Aragón Ramírez (20221020060), Santiago Reyes Gómez (20221020068), and Juan Andrés Jiménez Palomino (20221020087)
 
-> The MDP formulation document lives in `docs/mdp_spec.md`.
+The Double DQN agent predicts the class of one Fashion-MNIST image at each step. An episode contains `N=100` independently sampled images. The agent receives `+1/-1` for a correct or incorrect prediction. The environment reuses the Workshop 2 normalization and 70/15/15 split (seed 42).
+
+See the [MDP specification](docs/mdp_spec.md) for the environment and reward definitions.
 
 ## Results
 
@@ -18,7 +15,7 @@ so metrics stay comparable.
 | HistGradientBoosting (W1 best) | 87.48% | 0.8740 | best W1 baseline |
 | SmallCNN (W2) | 93.05% | 0.9302 | `../Workshop_2/runs/test_metrics.json` |
 | ResNet-18 (W2) | 94.94% | 0.9494 | `../Workshop_2/runs/resnet18/test_metrics.json` |
-| **DQN (W3, this work)** | 85.20% | n/a | return-derived (reward ±1); see `runs/workshop3/test_metrics.json` |
+| Double DQN (W3) | 85.20% | n/a | Accuracy derived from rewards over 200 test episodes in `runs/workshop3/test_metrics.json` |
 
 ## Structure
 
@@ -46,16 +43,14 @@ python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\act
 pip install -e .
 ```
 
-> Without an NVIDIA GPU (e.g. AMD/Intel/CPU): install the CPU torch build first to
-> avoid the heavy CUDA download, then the rest without dependencies:
+> For a CPU-only setup, install the CPU builds of PyTorch and torchvision first.
 > ```bash
 > pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 > pip install gymnasium scikit-learn matplotlib tqdm tensorboard
 > pip install -e . --no-deps
 > ```
 
-Requires Python ≥ 3.10, PyTorch ≥ 2.0. Data is reused from
-`../Workshop_1/code/data` (via Workshop 2) or downloaded with torchvision into `data/raw`.
+Requires Python ≥ 3.10 and PyTorch ≥ 2.0. The Workshop 2 loader reads the dataset from `../Workshop_1/code/data` when available. Otherwise, torchvision downloads it into `data/raw`.
 
 ## Quickstart
 

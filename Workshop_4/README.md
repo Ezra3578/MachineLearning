@@ -1,9 +1,12 @@
-# Workshop 4 — Autoencoders & Variational Autoencoders for Fashion-MNIST
+# Workshop 4. Autoencoders for Fashion-MNIST
 
-**Team 3** — Computer vision and object recognition.  
-Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020068) · Juan Andrés Jiménez Palomino (20221020087)
+Team 3 (computer vision and object recognition)
 
-Unsupervised representation learning on Fashion-MNIST using Convolutional Autoencoders (`ConvAE`), Denoising Autoencoders (`DenoisingConvAE`), and $\beta$-Variational Autoencoders (`ConvVAE`), evaluated on image reconstruction (MSE, PSNR, SSIM), semantic anomaly detection (ROC-AUC), and latent space structure (t-SNE, UMAP, Silhouette Score) compared against the Workshop 2 supervised `SmallCNN` encoder.
+Jhojan Stiven Aragón Ramírez (20221020060), Santiago Reyes Gómez (20221020068), and Juan Andrés Jiménez Palomino (20221020087)
+
+We trained a convolutional autoencoder (`ConvAE`), a denoising autoencoder (`DenoisingConvAE`), and $\beta$-variational autoencoders (`ConvVAE`) on Fashion-MNIST. We measure reconstruction with MSE, PSNR, and SSIM, and use ROC-AUC to evaluate how well the anomaly scores separate bags from wearable items. We compare the latent features with the frozen Workshop 2 `SmallCNN` encoder using silhouette scores and t-SNE and UMAP plots.
+
+The best ConvAE reached 26.11 dB PSNR and 0.909 SSIM. For anomaly detection, the best ROC-AUC was 0.9530 with the VAE's combined reconstruction and KL score.
 
 ## Structure
 
@@ -57,7 +60,7 @@ python -m src.analyze_latent --ae-ckpt checkpoints/ae_best.pt --vae-ckpt checkpo
     --w2-ckpt ../Workshop_2/checkpoints/model_best.pt
 ```
 
-## Deliverables Mapping (`Workshop_4.pdf`)
+## Files required by `Workshop_4.pdf`
 
 | Requirement | File / Path |
 |---|---|

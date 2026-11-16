@@ -1,9 +1,12 @@
-# Workshop 5 — Generative Adversarial Networks (GAN & WGAN-GP) for Fashion-MNIST
+# Workshop 5. GANs for Fashion-MNIST
 
-**Team 3** — Computer vision and object recognition.  
-Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020068) · Juan Andrés Jiménez Palomino (20221020087)
+Team 3 (computer vision and object recognition)
 
-Adversarial generative modeling on Fashion-MNIST comparing **Vanilla DCGAN** and **Wasserstein GAN with Gradient Penalty (`WGAN-GP`)** (plus optional **Conditional GAN (`cGAN`)**), evaluated via quantitative domain metrics (Fréchet Fashion-MNIST Distance / FID, Domain Inception Score, class entropy, and intra-class diversity), failure mode analysis, and a 3-condition **data augmentation experiment** retraining the Workshop 2 `SmallCNN` classifier.
+Jhojan Stiven Aragón Ramírez (20221020060), Santiago Reyes Gómez (20221020068), and Juan Andrés Jiménez Palomino (20221020087)
+
+We compare a vanilla DCGAN with a Wasserstein GAN with gradient penalty (`WGAN-GP`). We inspect failure modes and measure sample quality using Fréchet Fashion-MNIST Distance, domain Inception Score, class balance, and within-class diversity. The code also supports an optional conditional GAN (`cGAN`).
+
+We retrained the Workshop 2 `SmallCNN` for 25 epochs in each condition. Test accuracy was 91.97% with real data alone, 92.29% with real and vanilla GAN samples, and 92.25% with real and WGAN-GP samples.
 
 ## Structure
 
@@ -36,18 +39,14 @@ pip install -e .
 
 ## Notebooks
 
-Two executed notebooks document the workshop step by step. They call the same `src/` code as
-the CLI, so the cells are runnable references rather than a separate implementation:
+Both notebooks use the same `src/` code as the CLI. The training notebook runs both GANs, and the evaluation notebook reads saved results.
 
 | Notebook | What it walks through | Runtime |
 |---|---|---|
 | `notebooks/Training_Pipeline.ipynb` | Data in `[-1, 1]`, Generator/Discriminator/Critic, gradient penalty, Vanilla GAN and WGAN-GP demo training, sample grids, FFD/IS evaluation, synthetic-set construction, checkpoint verification, full CLI commands | ~2 min demo (MPS/CPU) |
 | `notebooks/GAN_Evaluation.ipynb` | 100-epoch training curves, report quality table, real vs generated grids, mode-collapse/discriminator/WGAN-GP/checkerboard analysis, latent interpolation, 3-condition augmentation results | ~1 min (no retraining) |
 
-Both notebooks default to `DEMO = True` / artifact-only analysis and write demo outputs to
-`runs/notebook_demo/` and `checkpoints/notebook_demo/`, so the reported checkpoints and logs
-are never overwritten. Set `DEMO = False` in `Training_Pipeline.ipynb` to run the same 100-epoch
-schedule from the notebook.
+`Training_Pipeline.ipynb` currently sets `DEMO = False`, which trains each GAN for 100 epochs. Set `DEMO = True` before running it for a two-epoch demonstration. Both modes put notebook training outputs in `runs/notebook_demo/` and `checkpoints/notebook_demo/`.
 
 ## Quickstart
 
@@ -74,7 +73,7 @@ python -m src.augment_and_retrain --vanilla-ckpt checkpoints/gan_vanilla_best.pt
     --wgan-ckpt checkpoints/gan_wgan_best.pt --num-synthetic 3000 --epochs 25
 ```
 
-## Deliverables Mapping (`Workshop_5.pdf`)
+## Files required by `Workshop_5.pdf`
 
 | Requirement | File / Path |
 |---|---|
