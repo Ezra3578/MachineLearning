@@ -2,7 +2,7 @@
 
 Team 3 (computer vision and object recognition)
 
-Jhojan Stiven Aragón Ramírez (20221020060), Santiago Reyes Gómez (20221020068), and Juan Andrés Jiménez Palomino (20221020087)
+Jhojan Stiven Aragón Ramírez (20221020060), Santiago Reyes Gómez (20221020098), and Juan Andrés Jiménez Palomino (20221020087)
 
 We trained a convolutional autoencoder (`ConvAE`), a denoising autoencoder (`DenoisingConvAE`), and $\beta$-variational autoencoders (`ConvVAE`) on Fashion-MNIST. We measure reconstruction with MSE, PSNR, and SSIM, and use ROC-AUC to evaluate how well the anomaly scores separate bags from wearable items. We compare the latent features with the frozen Workshop 2 `SmallCNN` encoder using silhouette scores and t-SNE and UMAP plots.
 

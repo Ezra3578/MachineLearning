@@ -2,7 +2,7 @@
 
 Team 3 (computer vision and object recognition)
 
-Jhojan Stiven Aragón Ramírez (20221020060), Santiago Reyes Gómez (20221020068), and Juan Andrés Jiménez Palomino (20221020087)
+Jhojan Stiven Aragón Ramírez (20221020060), Santiago Reyes Gómez (20221020098), and Juan Andrés Jiménez Palomino (20221020087)
 
 We compare a vanilla DCGAN with a Wasserstein GAN with gradient penalty (`WGAN-GP`). We inspect failure modes and measure sample quality using Fréchet Fashion-MNIST Distance, domain Inception Score, class balance, and within-class diversity. The code also supports an optional conditional GAN (`cGAN`).
 

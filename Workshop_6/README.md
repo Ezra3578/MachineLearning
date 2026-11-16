@@ -1,7 +1,7 @@
 # Workshop 6 — Medical Domain Adaptation: Fashion-MNIST CNNs to Chest X-rays (PneumoniaMNIST)
 
 **Team 3** — Computer vision and object recognition.
-Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020068) · Juan Andrés Jiménez Palomino (20221020087)
+Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020098) · Juan Andrés Jiménez Palomino (20221020087)
 
 Final workshop: the SmallCNN trained on Fashion-MNIST in Workshop 2 is adapted to
 pediatric pneumonia detection on chest radiographs (PneumoniaMNIST), with clinical
