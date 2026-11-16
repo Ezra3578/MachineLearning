@@ -1,0 +1,57 @@
+{
+  "name": "frozen",
+  "config": {
+    "name": "frozen",
+    "mode": "frozen",
+    "preprocess": "none",
+    "class_weights": "none",
+    "augment": "none",
+    "epochs": 25,
+    "batch_size": 128,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "patience": 7,
+    "seed": 42,
+    "data_root": "data",
+    "device": "cpu"
+  },
+  "transfer": {
+    "mode": "frozen",
+    "w2_checkpoint": "C:\\Users\\santi\\Documents\\personal\\ud\\sem 10\\ML\\Git\\MachineLearning\\Workshop_2\\checkpoints\\model_best.pt",
+    "loaded": true,
+    "source_model": "smallcnn",
+    "source_classes": [
+      "T-shirt/top",
+      "Trouser",
+      "Pullover",
+      "Dress",
+      "Coat",
+      "Sandal",
+      "Shirt",
+      "Sneaker",
+      "Bag",
+      "Ankle boot"
+    ],
+    "transferred_layers": 30,
+    "reinitialized": [
+      "classifier.2.weight",
+      "classifier.2.bias"
+    ],
+    "trainable_params": 129,
+    "frozen_params": 139168
+  },
+  "normalization": {
+    "mean": 0.5719216465950012,
+    "std": 0.16835126280784607,
+    "preprocess": "none"
+  },
+  "class_counts": {
+    "normal": 1214,
+    "pneumonia": 3494
+  },
+  "best_val_auc": 0.9152,
+  "best_epoch": 24,
+  "epochs_run": 25,
+  "train_seconds": 49.8,
+  "checkpoint": "checkpoints\\frozen_best.pt"
+}

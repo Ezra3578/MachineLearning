@@ -1,0 +1,80 @@
+[
+  {
+    "name": "finetune",
+    "mode": "finetune",
+    "preprocess": "none",
+    "class_weights": "none",
+    "augment": "none",
+    "auc_roc": 0.9777,
+    "val_auc": 0.997753022945825,
+    "sens@0.5": 0.9974,
+    "spec@0.5": 0.7051,
+    "ppv@0.5": 0.8493,
+    "npv@0.5": 0.994
+  },
+  {
+    "name": "finetune_clahe",
+    "mode": "finetune",
+    "preprocess": "clahe",
+    "class_weights": "none",
+    "augment": "none",
+    "auc_roc": 0.9647,
+    "val_auc": 0.9928020565552699,
+    "sens@0.5": 0.9974,
+    "spec@0.5": 0.5513,
+    "ppv@0.5": 0.7874,
+    "npv@0.5": 0.9923
+  },
+  {
+    "name": "finetune_weights",
+    "mode": "finetune",
+    "preprocess": "none",
+    "class_weights": "balanced",
+    "augment": "none",
+    "auc_roc": 0.977,
+    "val_auc": 0.9983052461201561,
+    "sens@0.5": 0.9949,
+    "spec@0.5": 0.7393,
+    "ppv@0.5": 0.8641,
+    "npv@0.5": 0.9886
+  },
+  {
+    "name": "frozen",
+    "mode": "frozen",
+    "preprocess": "none",
+    "class_weights": "none",
+    "augment": "none",
+    "auc_roc": 0.8627,
+    "val_auc": 0.9151861372941065,
+    "sens@0.5": 0.9667,
+    "spec@0.5": 0.3846,
+    "ppv@0.5": 0.7236,
+    "npv@0.5": 0.8738
+  },
+  {
+    "name": "full_recipe",
+    "mode": "finetune",
+    "preprocess": "clahe",
+    "class_weights": "balanced",
+    "augment": "medical",
+    "auc_roc": 0.9674,
+    "val_auc": 0.9959630581738551,
+    "sens@0.5": 0.9846,
+    "spec@0.5": 0.7308,
+    "ppv@0.5": 0.8591,
+    "npv@0.5": 0.9661
+  },
+  {
+    "name": "scratch",
+    "mode": "scratch",
+    "preprocess": "none",
+    "class_weights": "none",
+    "augment": "none",
+    "auc_roc": 0.9765,
+    "val_auc": 0.9978482338379511,
+    "sens@0.5": 1.0,
+    "spec@0.5": 0.6581,
+    "ppv@0.5": 0.8298,
+    "npv@0.5": 1.0
+  }
+]
