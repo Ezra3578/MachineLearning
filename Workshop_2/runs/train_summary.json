@@ -1,0 +1,27 @@
+{
+  "model": "smallcnn",
+  "best_epoch": 29,
+  "best_val_f1_macro": 0.9332387252416655,
+  "epochs_ran": 30,
+  "args": {
+    "model": "smallcnn",
+    "epochs": 30,
+    "batch_size": 128,
+    "lr": 0.001,
+    "optimizer": "adam",
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "scheduler": "cosine",
+    "label_smoothing": 0.0,
+    "mixup": 0.0,
+    "augment": true,
+    "freeze_epochs": 0,
+    "patience": 8,
+    "seed": 42,
+    "num_workers": 2,
+    "data_root": "data",
+    "checkpoint_dir": "checkpoints",
+    "runs_dir": "runs",
+    "device": "auto"
+  }
+}

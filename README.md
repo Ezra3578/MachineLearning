@@ -1,27 +1,23 @@
-# Machine Learning
+# Machine Learning (Team 3)
 
-This repository contains the information and retrievals of the workshops from the Machine Learning class.
+Code, checkpoints, training logs, and reports for the Machine Learning course project at Universidad Distrital Francisco José de Caldas (semester 2026-III).
 
-## Team Members
-- Jhojan Stiven Aragón Ramírez - 20221020060
-- Santiago Reyes Gómez - 20221020098
-- Juan Andrés Jiménez Palomino - 20221020087
+## Team
 
-## Problem's Domain
-The domain where this implementations of AI solutions revolves around is Computer Vision oriented to Image Classification.
+- Jhojan Stiven Aragón Ramírez (`20221020060`)
+- Santiago Reyes Gómez (`20221020068`)
+- Juan Andrés Jiménez Palomino (`20221020087`)
 
-Across the different workshops, there will be different approaches to solve such problems, each folder of the repository contains the necessary information to fully understand the requirements, the approach of the solution and its corresponding conclussion analysis.
+## Dataset
 
----
+We use Fashion-MNIST for image classification and the related reconstruction and generation tasks. It has `70,000` grayscale `28×28` images across `10` balanced classes. The workshop experiments use a stratified 70/15/15 split with `seed = 42`.
 
-## Workshops Structure
+## Workshops
 
-### [Workshop 1: Data Preparation & Supervised Learning Base Models](Workshop_1/README.md)
-- **Domain:** Image classification to the dataset of Fashion-MNIST. This dataset is composed of 10 classes, with 70000 monocromatic images of 28x28 pixels.
-- **Reach:**
-  - Download and verification of cryptographic integrity (hashes MD5 and SHA-256).
-  - Exploratory Data Analysis (EDA): Luminic intensity stats, class balance (*Imbalance Ratio* = 1.0), avg images and 2D projections using PCA.
-  - Processing Pipeline: Reproducible stratified partition (70% train / 15% val / 15% test en `data/splits.json`), z-score standarization (`StandardScaler`), augmented data in training (horizontal flip and traslation) and dimensionality reduction using PCA (95% cumulative variance).
-  - Supervised Learning Base Models: Multiclass Logistic Regression, Random Forest & HistGradientBoosting.
-  - Performance Evaluation: Accuracy, Precision, F1-Score & One vs. All Confusion Matrixes. To evaluate general performance and per class.
-- **To seek complete reproductibility:** Go to [Workshop_1/README.md](Workshop_1/README.md).
+| Folder | Topic | Models and results |
+|---|---|---|
+| [`Workshop_1/`](Workshop_1/) | Classical supervised learning | Logistic regression, random forest (`85.90%`) and HistGradientBoosting (`87.48%` test accuracy, `0.8740` macro F1) |
+| [`Workshop_2/`](Workshop_2/) | Convolutional neural networks | `SmallCNN` trained from scratch (`93.05%`, `0.9302` macro F1) and ImageNet-pretrained `ResNet-18` (`94.94%`, `0.9494` macro F1), with Grad-CAM analysis |
+| [`Workshop_3/`](Workshop_3/) | Sequential classification with reinforcement learning | `FashionMNISTClassifyEnv` (`gymnasium`) and Double DQN (`85.20%` accuracy over test episodes, mean return `70.39`) |
+| [`Workshop_4/`](Workshop_4/) | Autoencoders and VAEs | `ConvAE`, `ConvVAE` ($\beta \in \{0.5, 1.0, 4.0\}$), and `DenoisingConvAE`. The best reconstruction reached `26.11 dB` PSNR, and the best anomaly score reached `0.9530` ROC-AUC. Latent features are compared with W2 using t-SNE and UMAP. |
+| [`Workshop_5/`](Workshop_5/) | Generative adversarial networks | `VanillaGAN` and `WGAN-GP` ($\lambda=10, n_{\text{critic}}=5$), evaluated with domain Fréchet distance and Inception Score. Adding vanilla GAN samples to the W2 classifier's training data improved accuracy by `0.32` percentage points over the 25-epoch real-only run. |

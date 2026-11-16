@@ -1,0 +1,38 @@
+{
+  "Unsupervised ConvAE (z=64)": {
+    "latent_dim": 64,
+    "silhouette_high_dim": 0.06523076444864273,
+    "silhouette_tsne_2d": 0.19177864491939545,
+    "silhouette_umap_2d": 0.21719646453857422
+  },
+  "Unsupervised ConvVAE (mu, beta=1.0)": {
+    "latent_dim": 64,
+    "silhouette_high_dim": 0.07149568945169449,
+    "silhouette_tsne_2d": 0.1856827586889267,
+    "silhouette_umap_2d": 0.2049030363559723
+  },
+  "Supervised W2 SmallCNN (128-d GAP)": {
+    "latent_dim": 128,
+    "silhouette_high_dim": 0.31190091371536255,
+    "silhouette_tsne_2d": 0.4486997723579407,
+    "silhouette_umap_2d": 0.5245577096939087
+  },
+  "ConvVAE (beta = 0.5)": {
+    "latent_dim": 64,
+    "silhouette_high_dim": 0.049485594034194946,
+    "silhouette_tsne_2d": 0.18010461330413818,
+    "silhouette_umap_2d": 0.22997699677944183
+  },
+  "ConvVAE (beta = 1.0)": {
+    "latent_dim": 64,
+    "silhouette_high_dim": 0.07149568945169449,
+    "silhouette_tsne_2d": 0.1856827586889267,
+    "silhouette_umap_2d": 0.2049030363559723
+  },
+  "ConvVAE (beta = 4.0)": {
+    "latent_dim": 64,
+    "silhouette_high_dim": 0.09275439381599426,
+    "silhouette_tsne_2d": 0.13066260516643524,
+    "silhouette_umap_2d": 0.2013346403837204
+  }
+}

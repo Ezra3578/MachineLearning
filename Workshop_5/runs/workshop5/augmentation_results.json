@@ -1,0 +1,82 @@
+{
+  "num_real_train": 49000,
+  "num_synthetic_added": 3000,
+  "epochs": 25,
+  "vanilla_acceptance_rate": 0.6435555555555555,
+  "wgan_gp_acceptance_rate": 0.5864444444444444,
+  "w2_reference_smallcnn_30ep": {
+    "accuracy": 0.9304761904761905,
+    "f1_macro": 0.9302383175563008
+  },
+  "conditions": {
+    "real_only": {
+      "accuracy": 0.9197142857142857,
+      "precision_macro": 0.9195730119851847,
+      "recall_macro": 0.9197142857142857,
+      "f1_macro": 0.9195527840044411,
+      "roc_auc_ovr": 0.9952881733434115,
+      "per_class_f1": {
+        "T-shirt/top": 0.8591954022988506,
+        "Trouser": 0.9890004782400765,
+        "Pullover": 0.884321223709369,
+        "Dress": 0.9187913125590179,
+        "Coat": 0.878139534883721,
+        "Sandal": 0.9818529130850048,
+        "Shirt": 0.7602905569007264,
+        "Sneaker": 0.9631379962192816,
+        "Bag": 0.9885496183206107,
+        "Ankle boot": 0.9722488038277513
+      },
+      "best_val_f1": 0.9278135257120956,
+      "best_epoch": 25,
+      "train_samples": 49000,
+      "train_sec": 315.62
+    },
+    "real_plus_vanilla_gan": {
+      "accuracy": 0.9228571428571428,
+      "precision_macro": 0.9224695591019074,
+      "recall_macro": 0.9228571428571429,
+      "f1_macro": 0.9224950739146376,
+      "roc_auc_ovr": 0.995406379440665,
+      "per_class_f1": {
+        "T-shirt/top": 0.8692779613025012,
+        "Trouser": 0.9889899473432264,
+        "Pullover": 0.8948374760994264,
+        "Dress": 0.9206945096198967,
+        "Coat": 0.8799626342830453,
+        "Sandal": 0.9808978032473734,
+        "Shirt": 0.7672583826429981,
+        "Sneaker": 0.9626830420406235,
+        "Bag": 0.9899856938483548,
+        "Ankle boot": 0.9703632887189293
+      },
+      "best_val_f1": 0.9282030679211266,
+      "best_epoch": 25,
+      "train_samples": 52000,
+      "train_sec": 327.43
+    },
+    "real_plus_wgan_gp": {
+      "accuracy": 0.9224761904761904,
+      "precision_macro": 0.9224146048463379,
+      "recall_macro": 0.9224761904761906,
+      "f1_macro": 0.9223659153941138,
+      "roc_auc_ovr": 0.9955233056185439,
+      "per_class_f1": {
+        "T-shirt/top": 0.8693994280266921,
+        "Trouser": 0.9875478927203065,
+        "Pullover": 0.8938814531548758,
+        "Dress": 0.9223529411764706,
+        "Coat": 0.8801498127340824,
+        "Sandal": 0.9818181818181818,
+        "Shirt": 0.7649903288201161,
+        "Sneaker": 0.9627885068299576,
+        "Bag": 0.9894937917860553,
+        "Ankle boot": 0.9712368168744008
+      },
+      "best_val_f1": 0.9258447283389737,
+      "best_epoch": 25,
+      "train_samples": 52000,
+      "train_sec": 323.7
+    }
+  }
+}
