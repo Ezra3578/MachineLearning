@@ -22,7 +22,9 @@ import numpy as np
 import torch
 
 from src import medical_preprocessing as mp
+from src.device import pick_device
 from src.medical_metrics import full_evaluation
+from src.plotting import save_figure
 from src.train_medical import build_arrays, predict_proba
 from src.transfer import SmallCNN
 
@@ -30,16 +32,22 @@ from src.transfer import SmallCNN
 def evaluate_checkpoint(
     checkpoint: str | Path,
     data_root: str = "data",
-    device: str = "cpu",
+    device: str = "auto",
+    cache: dict | None = None,
 ) -> dict:
-    dev = torch.device(device)
+    dev = pick_device(device)
     ckpt = torch.load(checkpoint, map_location="cpu", weights_only=False)
     cfg = ckpt["config"]
     model = SmallCNN(num_classes=1)
     model.load_state_dict(ckpt["state_dict"])
     model.to(dev).eval()
 
-    arrays, labels, _ = build_arrays(cfg["preprocess"], data_root)
+    if cache is not None and cfg["preprocess"] in cache:
+        arrays, labels = cache[cfg["preprocess"]]
+    else:
+        arrays, labels, _ = build_arrays(cfg["preprocess"], data_root)
+        if cache is not None:
+            cache[cfg["preprocess"]] = (arrays, labels)
     proba = predict_proba(model, arrays["test"], dev)
     y = labels["test"]
 
@@ -77,8 +85,7 @@ def plot_roc_curves(results: list[dict], out_path: Path) -> Path | None:
     ax.set_title("ROC on PneumoniaMNIST test")
     ax.legend(fontsize=8, loc="lower right")
     fig.tight_layout()
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, dpi=150)
+    save_figure(fig, out_path)
     plt.close(fig)
     return out_path
 
@@ -88,7 +95,7 @@ def main() -> None:
     p.add_argument("--checkpoint", default=None, help="single checkpoint; default: all *_best.pt")
     p.add_argument("--data-root", default="data")
     p.add_argument("--out-dir", default="runs/workshop6")
-    p.add_argument("--device", default="cpu")
+    p.add_argument("--device", default="auto", help="auto|cpu|cuda|mps|privateuseone")
     args = p.parse_args()
 
     from sklearn.metrics import roc_curve
@@ -103,16 +110,17 @@ def main() -> None:
         raise SystemExit("no checkpoints found; train a run first")
 
     results = []
+    cache: dict = {}
     for ck in ckpts:
-        r = evaluate_checkpoint(ck, args.data_root, args.device)
+        r = evaluate_checkpoint(ck, args.data_root, args.device, cache)
         # attach ROC curve points for the figure
         ckpt = torch.load(ck, map_location="cpu", weights_only=False)
         cfg = ckpt["config"]
-        arrays, labels, _ = build_arrays(cfg["preprocess"], args.data_root)
+        arrays, labels = cache[cfg["preprocess"]]
         model = SmallCNN(num_classes=1)
         model.load_state_dict(ckpt["state_dict"])
-        model.eval()
-        proba = predict_proba(model, arrays["test"], torch.device(args.device))
+        model.to(pick_device(args.device)).eval()
+        proba = predict_proba(model, arrays["test"], pick_device(args.device))
         fpr, tpr, _ = roc_curve(labels["test"], proba)
         r["fpr"] = fpr.tolist()
         r["tpr"] = tpr.tolist()

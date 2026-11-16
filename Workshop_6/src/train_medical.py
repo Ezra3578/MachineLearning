@@ -30,6 +30,7 @@ import torch.nn as nn
 from sklearn.metrics import roc_auc_score
 
 from src import medical_preprocessing as mp
+from src.device import pick_device
 from src.transfer import build_transferred_model
 
 
@@ -128,11 +129,11 @@ def main() -> None:
     p.add_argument("--patience", type=int, default=7, help="early stop patience on val AUC")
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--data-root", type=str, default="data")
-    p.add_argument("--device", type=str, default="cpu")
+    p.add_argument("--device", type=str, default="auto", help="auto|cpu|cuda|mps|privateuseone")
     args = p.parse_args()
 
     seed_everything(args.seed)
-    device = torch.device(args.device)
+    device = pick_device(args.device)
     arrays, labels, stats = build_arrays(args.preprocess, args.data_root)
     x_tr = torch.from_numpy(arrays["train"])
     y_tr = torch.from_numpy(labels["train"]).long()

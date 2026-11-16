@@ -40,7 +40,7 @@ def clinical_metrics(y_true: np.ndarray, proba: np.ndarray, thr: float = 0.5) ->
     npv = tn / (tn + fn) if (tn + fn) else float("nan")
     acc = (tp + tn) / max(tp + fp + tn + fn, 1)
     return {
-        "threshold": round(float(thr), 3),
+        "threshold": round(float(thr), 4),
         "TP": tp, "FP": fp, "TN": tn, "FN": fn,
         "sensitivity": round(sens, 4),
         "specificity": round(spec, 4),
@@ -74,16 +74,21 @@ def youden_threshold(y_true: np.ndarray, proba: np.ndarray) -> float:
 
 
 def full_evaluation(y_true: np.ndarray, proba: np.ndarray) -> dict:
-    """AUC + threshold table + Youden operating point."""
+    """AUC + threshold table + Youden operating point.
+
+    The Youden threshold is rounded to four decimals and the reported metrics
+    are recomputed at that value, so the published number reproduces the
+    published confusion counts.
+    """
     y_true = np.asarray(y_true)
     proba = np.asarray(proba)
-    t = youden_threshold(y_true, proba)
+    t = round(youden_threshold(y_true, proba), 4)
     return {
         "n": int(len(y_true)),
         "prevalence": round(float(y_true.mean()), 4),
         "auc_roc": round(float(roc_auc_score(y_true, proba)), 4),
         "thresholds": threshold_sweep(y_true, proba),
-        "youden": {"threshold": round(t, 3), **clinical_metrics(y_true, proba, t)},
+        "youden": {"threshold": t, **clinical_metrics(y_true, proba, t)},
     }
 
 

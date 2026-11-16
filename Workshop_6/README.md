@@ -43,8 +43,12 @@ Workshop_6/
 │   ├── transfer.py               # SmallCNN + frozen/finetune/scratch transfer modes
 │   ├── medical_metrics.py        # sens/spec/PPV/NPV, threshold sweep, Youden J
 │   ├── train_medical.py          # training loop (BCE, Adam, cosine, early stop on val AUC)
-│   ├── interpretability.py       # Grad-CAM figures + case reports
-│   └── evaluate_medical.py       # test evaluation, ROC figure, ablation table
+│   ├── interpretability.py       # Grad-CAM figures, case reports, regional attribution
+│   ├── evaluate_medical.py       # test evaluation, ROC figure, ablation table
+│   ├── bootstrap_ci.py           # bootstrap AUC intervals and paired contrasts
+│   ├── figures.py                # dataset overview, training curves, confusion matrices
+│   ├── plotting.py               # shared RGB figure saving (pdfTeX-safe PNGs)
+│   └── device.py                 # auto device selection (CUDA -> MPS -> DirectML -> CPU)
 ├── checkpoints/                  # <run>_best.pt per configuration
 ├── runs/workshop6/               # train logs, test metrics, figures, reports
 ├── docs/                         # group3_medical_final_report.tex / .pdf
@@ -78,13 +82,18 @@ python -m src.train_medical --name full_recipe       --mode finetune --preproces
 # 2. Clinical evaluation of every run (threshold tables, ROC, ablation table)
 python -m src.evaluate_medical
 
-# 3. Grad-CAM interpretability on the best checkpoint
-python -m src.interpretability --checkpoint checkpoints/full_recipe_best.pt
+# 3. Grad-CAM interpretability on the best checkpoint (+ regional attribution)
+python -m src.interpretability --checkpoint checkpoints/finetune_weights_best.pt
+
+# 4. Dataset overview, training curves and confusion matrices
+python -m src.figures
 ```
 
-All runs use seed 42; results land in `runs/workshop6/`
+All runs use seed 42 and `--device auto` (CUDA, then Apple MPS, then AMD
+DirectML, then CPU); results land in `runs/workshop6/`
 (`ablation_results.json`, `test_metrics_<run>.json`, `roc_curves.png`,
-`gradcam_analysis.png`, `interpretability_report.json`).
+`gradcam_analysis.png`, `interpretability_report.json`, `dataset_overview.png`,
+`training_curves.png`, `confusion_matrices.png`).
 
 ## Report
 

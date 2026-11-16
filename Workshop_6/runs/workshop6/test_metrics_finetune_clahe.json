@@ -96,7 +96,7 @@
     }
   ],
   "youden": {
-    "threshold": 0.995,
+    "threshold": 0.9947,
     "TP": 361,
     "FP": 26,
     "TN": 208,

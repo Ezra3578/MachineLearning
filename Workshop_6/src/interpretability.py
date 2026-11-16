@@ -27,9 +27,59 @@ import torch
 import torch.nn.functional as F
 
 from src import medical_preprocessing as mp
+from src.device import pick_device
 from src.medical_metrics import confusion_counts
+from src.plotting import save_figure
 from src.train_medical import build_arrays, predict_proba
 from src.transfer import SmallCNN
+
+
+def region_masks(size: int = 28) -> tuple[np.ndarray, np.ndarray]:
+    """Lung-field and image-border masks on the 28x28 grid.
+
+    The lung box covers both hemithoraces from the apices to the costophrenic
+    angles (rows 6-21, columns 3-24 here), leaving the mediastinum and the
+    corners out. The border ring is the outer three pixels, where a radiograph
+    has no lung tissue.
+    """
+    rows = np.arange(size)[:, None]
+    cols = np.arange(size)[None, :]
+    left = (rows >= 6) & (rows <= 21) & (cols >= 3) & (cols <= 10)
+    right = (rows >= 6) & (rows <= 21) & (cols >= 18) & (cols <= 24)
+    border = (rows < 3) | (rows > size - 4) | (cols < 3) | (cols > size - 4)
+    return left | right, border
+
+
+def attribution_by_group(cams: np.ndarray, y_true, proba, thr: float = 0.5) -> dict:
+    """Share of attribution energy on the lung fields and on the border.
+
+    Energy fractions are computed per image over the upsampled CAM, then
+    averaged within each outcome group. `peak_on_border` counts how often the
+    maximum of the map falls on the border ring.
+    """
+    lung, border = region_masks(cams.shape[-1])
+    pred = (proba >= thr).astype(int)
+    groups = {
+        "correct_pneumonia": (y_true == 1) & (pred == 1),
+        "correct_normal": (y_true == 0) & (pred == 0),
+        "false_negative": (y_true == 1) & (pred == 0),
+        "false_positive": (y_true == 0) & (pred == 1),
+    }
+    out = {}
+    for name, mask in groups.items():
+        n = int(mask.sum())
+        if n == 0:
+            continue
+        c = cams[mask]
+        total = c.sum(axis=(1, 2)) + 1e-9
+        peaks = np.array([np.unravel_index(np.argmax(c[i]), c.shape[-2:]) for i in range(n)])
+        out[name] = {
+            "n": n,
+            "lung_energy_share": round(float((c[:, lung].sum(axis=1) / total).mean()), 4),
+            "border_energy_share": round(float((c[:, border].sum(axis=1) / total).mean()), 4),
+            "peak_on_border_share": round(float(border[peaks[:, 0], peaks[:, 1]].mean()), 4),
+        }
+    return out
 
 
 class GradCAM:
@@ -122,8 +172,7 @@ def make_figure(
         axes[r][0].set_ylabel(group.replace("_", " "), fontsize=9)
     fig.suptitle("Grad-CAM: pneumonia evidence (red = high attribution)", fontsize=11)
     fig.tight_layout()
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, dpi=200)
+    save_figure(fig, out_path, dpi=200)
     plt.close(fig)
     return out_path
 
@@ -133,9 +182,9 @@ def run_analysis(
     out_dir: str | Path = "runs/workshop6",
     n_per_group: int = 4,
     data_root: str = "data",
-    device: str = "cpu",
+    device: str = "auto",
 ) -> dict:
-    dev = torch.device(device)
+    dev = pick_device(device)
     ckpt = torch.load(checkpoint, map_location="cpu", weights_only=False)
     cfg = ckpt["config"]
     model = SmallCNN(num_classes=1)
@@ -154,11 +203,20 @@ def run_analysis(
         raw = mp.apply_clahe(raw)
 
     cam_tool = GradCAM(model, model.features[6])  # last conv block: 128 x 7 x 7
-    mean, std = ckpt["normalization"]["mean"], ckpt["normalization"]["std"]
 
     def cam_fn(i: int) -> np.ndarray:
         t = torch.from_numpy(x_test[i]).to(dev)  # (C,H,W)
         return cam_tool(t)
+
+    # attribution over the whole test split, for the regional summary
+    cams = np.zeros((len(y_test), 28, 28), dtype=np.float32)
+    for i in range(len(y_test)):
+        cam = cam_fn(i)
+        cam = torch.from_numpy(cam)[None, None]
+        cam = torch.nn.functional.interpolate(cam, size=(28, 28), mode="bilinear",
+                                              align_corners=False)
+        cams[i] = cam[0, 0].numpy()
+    regions = attribution_by_group(cams, y_test, proba, thr)
 
     out_dir = Path(out_dir)
     fig_path = make_figure(raw, cases, y_test, proba, thr, cam_fn,
@@ -171,6 +229,7 @@ def run_analysis(
         "threshold": thr,
         "confusion_at_threshold": {"TP": tp, "FP": fp_, "TN": tn, "FN": fn_},
         "cases": {g: [int(i) for i in idxs] for g, idxs in cases.items()},
+        "attribution_by_group": regions,
         "case_details": {
             g: [{"index": int(i), "true": ("pneumonia" if y_test[i] == 1 else "normal"),
                  "p_pneumonia": round(float(proba[i]), 4)} for i in idxs]
@@ -183,6 +242,11 @@ def run_analysis(
     for g, idxs in cases.items():
         for i in idxs:
             print(f"  {g:<18} idx={i:<4} true={'P' if y_test[i] else 'N'} p={proba[i]:.3f}")
+    print("[interpretability] attribution by group (energy share)")
+    for g, stats in regions.items():
+        print(f"  {g:<18} n={stats['n']:<4} lung={stats['lung_energy_share']:.3f} "
+              f"border={stats['border_energy_share']:.3f} "
+              f"peak_on_border={stats['peak_on_border_share']:.3f}")
     return report
 
 
@@ -192,5 +256,5 @@ if __name__ == "__main__":
     ap.add_argument("--out-dir", default="runs/workshop6")
     ap.add_argument("--n-per-group", type=int, default=4)
     ap.add_argument("--data-root", default="data")
-    ap.add_argument("--device", default="cpu")
+    ap.add_argument("--device", default="auto", help="auto|cpu|cuda|mps|privateuseone")
     run_analysis(**vars(ap.parse_args()))

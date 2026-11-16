@@ -31,6 +31,32 @@
       67
     ]
   },
+  "attribution_by_group": {
+    "correct_pneumonia": {
+      "n": 388,
+      "lung_energy_share": 0.4115,
+      "border_energy_share": 0.1238,
+      "peak_on_border_share": 0.0
+    },
+    "correct_normal": {
+      "n": 173,
+      "lung_energy_share": 0.1893,
+      "border_energy_share": 0.3999,
+      "peak_on_border_share": 0.3988
+    },
+    "false_negative": {
+      "n": 2,
+      "lung_energy_share": 0.3759,
+      "border_energy_share": 0.05,
+      "peak_on_border_share": 0.0
+    },
+    "false_positive": {
+      "n": 61,
+      "lung_energy_share": 0.3654,
+      "border_energy_share": 0.1255,
+      "peak_on_border_share": 0.0
+    }
+  },
   "case_details": {
     "correct_pneumonia": [
       {
