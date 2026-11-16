@@ -53,6 +53,7 @@ Workshop_6/
 ├── runs/workshop6/               # train logs, test metrics, figures, reports
 ├── docs/                         # group3_medical_final_report.tex / .pdf
 └── data/                         # PneumoniaMNIST (auto-downloaded, gitignored)
+
 ```
 
 ## Setup
