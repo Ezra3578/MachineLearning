@@ -270,6 +270,7 @@ build/
 Workshop_1_guide.md
 *.joblib
 .venv-gpu/
+.venv-rocm/
 
 # Notebook demo artifacts
 notebook_demo/
