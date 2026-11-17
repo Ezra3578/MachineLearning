@@ -73,7 +73,7 @@ python -m src.augment_and_retrain --vanilla-ckpt checkpoints/gan_vanilla_best.pt
     --wgan-ckpt checkpoints/gan_wgan_best.pt --num-synthetic 3000 --epochs 25
 ```
 
-## Files required by `Workshop_5.pdf`
+## Files required by `group3_workshop5.pdf`
 
 | Requirement | File / Path |
 |---|---|
@@ -84,4 +84,4 @@ python -m src.augment_and_retrain --vanilla-ckpt checkpoints/gan_vanilla_best.pt
 | Data augmentation experiment (3 conditions) | `src/augment_and_retrain.py` |
 | Best generator checkpoints | `checkpoints/gan_vanilla_best.pt`, `checkpoints/gan_wgan_best.pt` |
 | Training logs and generated samples | `runs/workshop5/` |
-| Report (PDF) | [Workshop 5 report](Workshop5.pdf) |
+| Report (PDF) | [Workshop 5 report](group3_workshop5.pdf) |

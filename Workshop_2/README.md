@@ -14,7 +14,7 @@ We trained a compact CNN from scratch and fine-tuned an ImageNet-pretrained ResN
 | SmallCNN (from scratch, 30 epochs) | 93.05% | 0.9302 | 0.9961 |
 | **ResNet-18 (ImageNet transfer, 20 epochs)** | **94.94%** | **0.9494** | **0.9979** |
 
-The [Workshop 2 report](Workshop2.pdf) compares both CNNs with all three Workshop 1 baselines. Its source is in `Workshop_2/` in `tex-team3-machine-learning`.
+The [Workshop 2 report](group3_workshop2.pdf) compares both CNNs with all three Workshop 1 baselines. Its source is in `Workshop_2/` in `tex-team3-machine-learning`.
 
 ## Files
 
@@ -126,4 +126,4 @@ python -m src.evaluate --checkpoint checkpoints/model_best.pt
 | Training logs & learning curves | `runs/`, `runs/*/tensorboard/` |
 | Qualitative analysis | `src/gradcam.py`, `notebooks/GradCAM_Analysis.ipynb` |
 | Documented training flow | `notebooks/Training_Pipeline.ipynb` |
-| Report (PDF) | [Workshop 2 report](Workshop2.pdf) |
+| Report (PDF) | [Workshop 2 report](group3_workshop2.pdf) |

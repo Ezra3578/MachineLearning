@@ -98,4 +98,4 @@ DirectML, then CPU); results land in `runs/workshop6/`
 ## Report
 | Requirement | File |
 |---|---|
-| Report (PDF) | [Workshop 6 report](Workshop6.pdf) |
+| Report (PDF) | [Workshop 6 report](group3_workshop6.pdf) |

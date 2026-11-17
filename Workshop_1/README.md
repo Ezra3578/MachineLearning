@@ -1,6 +1,6 @@
 # Workshop 1: Data Preparation & Supervised Learning Base Models
 
-[Workshop 1 report (PDF)](Workshop1.pdf)
+[Workshop 1 report (PDF)](group3_workshop1.pdf)
 
 ## 1. Dataset Description (Fashion-MNIST)
 
