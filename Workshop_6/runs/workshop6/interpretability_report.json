@@ -57,6 +57,23 @@
       "peak_on_border_share": 0.0
     }
   },
+  "failure_examples": {
+    "threshold_sensitive_positive": {
+      "index": 180,
+      "score": 0.6479620933532715
+    },
+    "normal_with_border_attribution": {
+      "index": 511,
+      "score": 3.0516960123350145e-06
+    },
+    "unexpected_clahe_error": {
+      "index": 265,
+      "true": "pneumonia",
+      "score": 0.9993963241577148,
+      "altered_score": 0.0002261510817334056,
+      "new_errors": 311
+    }
+  },
   "case_details": {
     "correct_pneumonia": [
       {

@@ -106,8 +106,7 @@ def build_transferred_model(
     if mode == "frozen":
         for p in model.features.parameters():
             p.requires_grad = False
-    # BatchNorm running stats: in frozen mode keep W2 statistics; in finetune
-    # mode they update during training.
+    # BatchNorm running statistics update when the backbone is in training mode.
     frozen = sum(p.numel() for p in model.parameters() if not p.requires_grad)
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     report.update({"trainable_params": trainable, "frozen_params": frozen})

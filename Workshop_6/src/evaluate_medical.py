@@ -21,9 +21,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from src import medical_preprocessing as mp
 from src.device import pick_device
-from src.medical_metrics import full_evaluation
+from src.medical_metrics import full_evaluation, youden_threshold
 from src.plotting import save_figure
 from src.train_medical import build_arrays, predict_proba
 from src.transfer import SmallCNN
@@ -34,6 +33,8 @@ def evaluate_checkpoint(
     data_root: str = "data",
     device: str = "auto",
     cache: dict | None = None,
+    *,
+    include_roc: bool = False,
 ) -> dict:
     dev = pick_device(device)
     ckpt = torch.load(checkpoint, map_location="cpu", weights_only=False)
@@ -51,7 +52,15 @@ def evaluate_checkpoint(
     proba = predict_proba(model, arrays["test"], dev)
     y = labels["test"]
 
-    ev = full_evaluation(y, proba)
+    val_proba = predict_proba(model, arrays["val"], dev)
+    threshold = youden_threshold(labels["val"], val_proba)
+    ev = full_evaluation(y, proba, operating_threshold=threshold)
+    ev["youden_selected_on"] = "val"
+    if include_roc:
+        from sklearn.metrics import roc_curve
+
+        fpr, tpr, _ = roc_curve(y, proba)
+        ev.update(fpr=fpr.tolist(), tpr=tpr.tolist())
     ev.update(
         {
             "name": cfg["name"],
@@ -68,8 +77,6 @@ def plot_roc_curves(results: list[dict], out_path: Path) -> Path | None:
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    from sklearn.metrics import roc_curve
-
     fig, ax = plt.subplots(figsize=(6.5, 5.5))
     for r in results:
         # recompute probas is expensive; reuse curve points stored during eval
@@ -98,8 +105,6 @@ def main() -> None:
     p.add_argument("--device", default="auto", help="auto|cpu|cuda|mps|privateuseone")
     args = p.parse_args()
 
-    from sklearn.metrics import roc_curve
-
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     if args.checkpoint:
@@ -112,23 +117,12 @@ def main() -> None:
     results = []
     cache: dict = {}
     for ck in ckpts:
-        r = evaluate_checkpoint(ck, args.data_root, args.device, cache)
-        # attach ROC curve points for the figure
-        ckpt = torch.load(ck, map_location="cpu", weights_only=False)
-        cfg = ckpt["config"]
-        arrays, labels = cache[cfg["preprocess"]]
-        model = SmallCNN(num_classes=1)
-        model.load_state_dict(ckpt["state_dict"])
-        model.to(pick_device(args.device)).eval()
-        proba = predict_proba(model, arrays["test"], pick_device(args.device))
-        fpr, tpr, _ = roc_curve(labels["test"], proba)
-        r["fpr"] = fpr.tolist()
-        r["tpr"] = tpr.tolist()
+        r = evaluate_checkpoint(ck, args.data_root, args.device, cache, include_roc=True)
         results.append(r)
         youden = r["youden"]
         print(f"[eval] {r['name']:<20} AUC {r['auc_roc']:.4f} | @0.5: sens "
               f"{r['thresholds'][3]['sensitivity']:.3f} spec {r['thresholds'][3]['specificity']:.3f} | "
-              f"youden thr {youden['threshold']:.2f} sens {youden['sensitivity']:.3f} "
+              f"val Youden {youden['threshold']:.4f} sens {youden['sensitivity']:.3f} "
               f"spec {youden['specificity']:.3f}")
 
     # per-checkpoint JSON + combined ablation table

@@ -96,18 +96,19 @@
     }
   ],
   "youden": {
-    "threshold": 0.9339,
-    "TP": 370,
-    "FP": 27,
-    "TN": 207,
-    "FN": 20,
-    "sensitivity": 0.9487,
-    "specificity": 0.8846,
-    "ppv": 0.932,
-    "npv": 0.9119,
-    "accuracy": 0.9247,
-    "balanced_accuracy": 0.9167
+    "threshold": 0.2454,
+    "TP": 386,
+    "FP": 80,
+    "TN": 154,
+    "FN": 4,
+    "sensitivity": 0.9897,
+    "specificity": 0.6581,
+    "ppv": 0.8283,
+    "npv": 0.9747,
+    "accuracy": 0.8654,
+    "balanced_accuracy": 0.8239
   },
+  "youden_selected_on": "val",
   "name": "full_recipe",
   "checkpoint": "checkpoints\\full_recipe_best.pt",
   "config": {

@@ -96,18 +96,19 @@
     }
   ],
   "youden": {
-    "threshold": 0.9949,
-    "TP": 375,
-    "FP": 25,
-    "TN": 209,
-    "FN": 15,
-    "sensitivity": 0.9615,
-    "specificity": 0.8932,
-    "ppv": 0.9375,
-    "npv": 0.933,
-    "accuracy": 0.9359,
-    "balanced_accuracy": 0.9274
+    "threshold": 0.9176,
+    "TP": 385,
+    "FP": 48,
+    "TN": 186,
+    "FN": 5,
+    "sensitivity": 0.9872,
+    "specificity": 0.7949,
+    "ppv": 0.8891,
+    "npv": 0.9738,
+    "accuracy": 0.9151,
+    "balanced_accuracy": 0.891
   },
+  "youden_selected_on": "val",
   "name": "scratch",
   "checkpoint": "checkpoints\\scratch_best.pt",
   "config": {

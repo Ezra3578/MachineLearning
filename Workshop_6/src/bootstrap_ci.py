@@ -30,7 +30,8 @@ CONTRASTS = (
     ("frozen", "scratch"),              # frozen features vs control
     ("finetune_weights", "finetune"),   # class weighting
     ("finetune_clahe", "finetune"),     # CLAHE
-    ("full_recipe", "finetune_weights"),  # augmentation on top of CLAHE + weights
+    ("finetune_clahe_weights", "finetune_weights"),  # CLAHE with class weighting held fixed
+    ("full_recipe", "finetune_clahe_weights"),      # augmentation with CLAHE and weights held fixed
 )
 
 

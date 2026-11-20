@@ -30,7 +30,10 @@ from src.plotting import save_figure
 from src.train_medical import build_arrays, predict_proba
 from src.transfer import SmallCNN
 
-RUNS = ("scratch", "frozen", "finetune", "finetune_clahe", "finetune_weights", "full_recipe")
+RUNS = (
+    "scratch", "frozen", "finetune", "finetune_clahe", "finetune_weights",
+    "finetune_clahe_weights", "full_recipe",
+)
 
 
 def dataset_overview(data_root: str, out_path: Path, n: int = 6, seed: int = 42) -> Path:
@@ -106,10 +109,11 @@ def confusion_matrices(
     arrays, labels, _ = build_arrays(cfg["preprocess"], data_root)
     proba = predict_proba(model, arrays["test"], dev)
     y = labels["test"]
-    youden = round(youden_threshold(y, proba), 4)
+    val_proba = predict_proba(model, arrays["val"], dev)
+    youden = round(youden_threshold(labels["val"], val_proba), 4)
 
-    points = (0.2, 0.5, youden)
-    titles = ("threshold 0.2", "threshold 0.5", f"Youden {youden:.4f}")
+    points = (0.4, 0.5, youden)
+    titles = ("threshold 0.4", "threshold 0.5", f"Validation Youden {youden:.4f}")
     fig, axes = plt.subplots(1, len(points), figsize=(4.2 * len(points), 4.2))
     for ax, thr, title in zip(axes, points, titles):
         tp, fp, tn, fn = confusion_counts(y, proba, thr)

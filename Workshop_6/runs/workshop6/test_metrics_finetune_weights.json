@@ -96,18 +96,19 @@
     }
   ],
   "youden": {
-    "threshold": 0.9843,
-    "TP": 375,
-    "FP": 19,
-    "TN": 215,
-    "FN": 15,
-    "sensitivity": 0.9615,
-    "specificity": 0.9188,
-    "ppv": 0.9518,
-    "npv": 0.9348,
-    "accuracy": 0.9455,
-    "balanced_accuracy": 0.9402
+    "threshold": 0.8863,
+    "TP": 383,
+    "FP": 32,
+    "TN": 202,
+    "FN": 7,
+    "sensitivity": 0.9821,
+    "specificity": 0.8632,
+    "ppv": 0.9229,
+    "npv": 0.9665,
+    "accuracy": 0.9375,
+    "balanced_accuracy": 0.9226
   },
+  "youden_selected_on": "val",
   "name": "finetune_weights",
   "checkpoint": "checkpoints\\finetune_weights_best.pt",
   "config": {

@@ -17,6 +17,13 @@
         0.9774
       ]
     },
+    "finetune_clahe_weights": {
+      "auc": 0.9652,
+      "ci95": [
+        0.9507,
+        0.978
+      ]
+    },
     "finetune_weights": {
       "auc": 0.977,
       "ci95": [
@@ -79,13 +86,21 @@
       ],
       "p_gt_zero": 0.005
     },
-    "full_recipe_minus_finetune_weights": {
-      "mean": -0.0095,
+    "finetune_clahe_weights_minus_finetune_weights": {
+      "mean": -0.0116,
       "ci95": [
-        -0.0191,
-        -0.0001
+        -0.0219,
+        -0.0022
       ],
-      "p_gt_zero": 0.025
+      "p_gt_zero": 0.006
+    },
+    "full_recipe_minus_finetune_clahe_weights": {
+      "mean": 0.0021,
+      "ci95": [
+        -0.0061,
+        0.0107
+      ],
+      "p_gt_zero": 0.692
     }
   }
 }

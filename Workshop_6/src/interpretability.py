@@ -107,7 +107,7 @@ class GradCAM:
         cam = F.relu((weights * self._activation).sum(dim=1))[0]
         cam = cam - cam.min()
         cam = cam / (cam.max() + 1e-8)
-        return cam.detach().numpy()
+        return cam.detach().cpu().numpy()
 
     def close(self) -> None:
         self._fwd.remove()
@@ -177,6 +177,38 @@ def make_figure(
     return out_path
 
 
+def failure_examples(model, raw, y, scores, cams, stats, device) -> dict:
+    """Return representative test cases for the deployment discussion."""
+    # A true positive at 0.5 that would be missed at a stricter threshold.
+    stricter = np.flatnonzero((y == 1) & (scores >= 0.5) & (scores < 0.8))
+    # A true negative whose positive-class explanation peaks at the edge.
+    _, border = region_masks(cams.shape[-1])
+    peak = cams.reshape(len(cams), -1).argmax(axis=1)
+    has_attribution = cams.max(axis=(1, 2)) > 0
+    corner = np.flatnonzero((y == 0) & (scores < 0.5) & has_attribution & border.ravel()[peak])
+    examples = {}
+    if stricter.size:
+        i = int(stricter[0])
+        examples["threshold_sensitive_positive"] = {"index": i, "score": float(scores[i])}
+    if corner.size:
+        i = int(corner[np.argmin(scores[corner])])
+        examples["normal_with_border_attribution"] = {"index": i, "score": float(scores[i])}
+    if stats["preprocess"] == "none":
+        # Simulate a pipeline mismatch without changing the checkpoint or its normalization.
+        altered = mp.make_tensors(mp.apply_clahe(raw), stats["mean"], stats["std"])
+        shifted = predict_proba(model, altered, device)
+        correct = (scores >= 0.5) == y
+        flips = np.flatnonzero(correct & ((shifted >= 0.5) != y))
+        if flips.size:
+            i = int(flips[np.argmax(np.abs(shifted[flips] - scores[flips]))])
+            examples["unexpected_clahe_error"] = {
+                "index": i, "true": mp.CLASS_NAMES[int(y[i])],
+                "score": float(scores[i]), "altered_score": float(shifted[i]),
+                "new_errors": int(flips.size),
+            }
+    return examples
+
+
 def run_analysis(
     checkpoint: str | Path,
     out_dir: str | Path = "runs/workshop6",
@@ -191,7 +223,7 @@ def run_analysis(
     model.load_state_dict(ckpt["state_dict"])
     model.to(dev).eval()
 
-    arrays, labels, _ = build_arrays(cfg["preprocess"], data_root)
+    arrays, labels, stats = build_arrays(cfg["preprocess"], data_root)
     x_test, y_test = arrays["test"], labels["test"]
     proba = predict_proba(model, x_test, dev)
     thr = 0.5
@@ -230,6 +262,7 @@ def run_analysis(
         "confusion_at_threshold": {"TP": tp, "FP": fp_, "TN": tn, "FN": fn_},
         "cases": {g: [int(i) for i in idxs] for g, idxs in cases.items()},
         "attribution_by_group": regions,
+        "failure_examples": failure_examples(model, raw, y_test, proba, cams, stats, dev),
         "case_details": {
             g: [{"index": int(i), "true": ("pneumonia" if y_test[i] == 1 else "normal"),
                  "p_pneumonia": round(float(proba[i]), 4)} for i in idxs]

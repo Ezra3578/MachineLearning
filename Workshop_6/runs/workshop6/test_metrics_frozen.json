@@ -96,18 +96,19 @@
     }
   ],
   "youden": {
-    "threshold": 0.7891,
-    "TP": 303,
-    "FP": 45,
-    "TN": 189,
-    "FN": 87,
-    "sensitivity": 0.7769,
-    "specificity": 0.8077,
-    "ppv": 0.8707,
-    "npv": 0.6848,
+    "threshold": 0.6994,
+    "TP": 338,
+    "FP": 80,
+    "TN": 154,
+    "FN": 52,
+    "sensitivity": 0.8667,
+    "specificity": 0.6581,
+    "ppv": 0.8086,
+    "npv": 0.7476,
     "accuracy": 0.7885,
-    "balanced_accuracy": 0.7923
+    "balanced_accuracy": 0.7624
   },
+  "youden_selected_on": "val",
   "name": "frozen",
   "checkpoint": "checkpoints\\frozen_best.pt",
   "config": {

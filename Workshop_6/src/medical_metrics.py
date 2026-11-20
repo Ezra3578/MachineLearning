@@ -73,22 +73,21 @@ def youden_threshold(y_true: np.ndarray, proba: np.ndarray) -> float:
     return float(best_thr)
 
 
-def full_evaluation(y_true: np.ndarray, proba: np.ndarray) -> dict:
+def full_evaluation(y_true: np.ndarray, proba: np.ndarray, *, operating_threshold: float) -> dict:
     """AUC + threshold table + Youden operating point.
 
-    The Youden threshold is rounded to four decimals and the reported metrics
-    are recomputed at that value, so the published number reproduces the
-    published confusion counts.
+    The supplied validation threshold is rounded before evaluation so the
+    published threshold reproduces the test confusion counts.
     """
     y_true = np.asarray(y_true)
     proba = np.asarray(proba)
-    t = round(youden_threshold(y_true, proba), 4)
+    t = round(operating_threshold, 4)
     return {
         "n": int(len(y_true)),
         "prevalence": round(float(y_true.mean()), 4),
         "auc_roc": round(float(roc_auc_score(y_true, proba)), 4),
         "thresholds": threshold_sweep(y_true, proba),
-        "youden": {"threshold": t, **clinical_metrics(y_true, proba, t)},
+        "youden": clinical_metrics(y_true, proba, t),
     }
 
 
@@ -98,4 +97,5 @@ if __name__ == "__main__":
     p = np.clip(0.2 * y + rng.uniform(0, 0.7, 500), 0, 1)
     import json
 
-    print(json.dumps(full_evaluation(y, p), indent=2))
+    threshold = youden_threshold(y[:250], p[:250])
+    print(json.dumps(full_evaluation(y[250:], p[250:], operating_threshold=threshold), indent=2))

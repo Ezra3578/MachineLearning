@@ -1,13 +1,12 @@
 # Workshop 6 — Medical Domain Adaptation: Fashion-MNIST CNNs to Chest X-rays (PneumoniaMNIST)
 
 **Team 3** — Computer vision and object recognition.
-Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020098) · Juan Andrés Jiménez Palomino (20221020087)
+Jhojan Stiven Aragón Ramírez (20221020060) · Santiago Reyes Gómez (20221020068) · Juan Andrés Jiménez Palomino (20221020087)
 
-Final workshop: the SmallCNN trained on Fashion-MNIST in Workshop 2 is adapted to
-pediatric pneumonia detection on chest radiographs (PneumoniaMNIST), with clinical
-metrics (sensitivity/specificity/PPV/NPV at several thresholds), Grad-CAM
-interpretability, an ablation study of the transfer components, and a clinical
-deployment assessment.
+We adapt the Workshop 2 SmallCNN from Fashion-MNIST to pediatric pneumonia
+detection on chest radiographs. The report compares transfer strategies,
+measures sensitivity, specificity, PPV and NPV at several thresholds, and
+examines where Grad-CAM explanations fail.
 
 ## Medical dataset
 
@@ -33,6 +32,8 @@ The loader downloads the data automatically into `data/` on first use.
 Medical adaptations under study: CLAHE contrast enhancement, class weighting for
 the 26/74 normal/pneumonia imbalance, and modality-appropriate augmentation
 (small rotations/translations, brightness jitter; no horizontal flips).
+In the frozen run, batch-normalization running statistics still update on the
+medical images.
 
 ## Structure
 
@@ -76,6 +77,7 @@ python -m src.train_medical --name frozen            --mode frozen
 python -m src.train_medical --name finetune          --mode finetune
 python -m src.train_medical --name finetune_clahe    --mode finetune --preprocess clahe
 python -m src.train_medical --name finetune_weights  --mode finetune --class-weights balanced
+python -m src.train_medical --name finetune_clahe_weights --mode finetune --preprocess clahe --class-weights balanced
 python -m src.train_medical --name full_recipe       --mode finetune --preprocess clahe \
     --class-weights balanced --augment medical
 
@@ -87,6 +89,9 @@ python -m src.interpretability --checkpoint checkpoints/finetune_weights_best.pt
 
 # 4. Dataset overview, training curves and confusion matrices
 python -m src.figures
+
+# 5. Confidence intervals and paired ablation contrasts
+python -m src.bootstrap_ci
 ```
 
 All runs use seed 42 and `--device auto` (CUDA, then Apple MPS, then AMD
@@ -95,7 +100,12 @@ DirectML, then CPU); results land in `runs/workshop6/`
 `gradcam_analysis.png`, `interpretability_report.json`, `dataset_overview.png`,
 `training_curves.png`, `confusion_matrices.png`).
 
+The evaluation selects the Youden threshold on validation and reports its
+metrics on the test split alongside the fixed thresholds. To evaluate the
+submitted models, start at step 2 with the existing checkpoints and logs.
+Use `--device cpu` to match the report's execution device.
+
 ## Report
-| Requirement | File |
-|---|---|
-| Report (PDF) | [Workshop 6 report](Workshop6.pdf) |
+
+[Final medical adaptation report](group3_medical_final_report.pdf) ·
+[`v1.0-medical-final` on GitHub](https://github.com/Ezra3578/MachineLearning/tree/v1.0-medical-final)

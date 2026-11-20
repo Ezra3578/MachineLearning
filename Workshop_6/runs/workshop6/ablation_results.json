@@ -26,6 +26,19 @@
     "npv@0.5": 0.9923
   },
   {
+    "name": "finetune_clahe_weights",
+    "mode": "finetune",
+    "preprocess": "clahe",
+    "class_weights": "balanced",
+    "augment": "none",
+    "auc_roc": 0.9652,
+    "val_auc": 0.9946491478625155,
+    "sens@0.5": 1.0,
+    "spec@0.5": 0.4487,
+    "ppv@0.5": 0.7514,
+    "npv@0.5": 1.0
+  },
+  {
     "name": "finetune_weights",
     "mode": "finetune",
     "preprocess": "none",

@@ -31,6 +31,7 @@ POS_CLASS = 1  # pneumonia is the clinically positive class
 def load_split_arrays(split: str, root: str | Path = "data") -> tuple[np.ndarray, np.ndarray]:
     """Return (images uint8 (N,28,28), labels (N,)) for one PneumoniaMNIST split."""
     root = Path(root).resolve()
+    root.mkdir(parents=True, exist_ok=True)
     ds = PneumoniaMNIST(split=split, download=True, root=str(root))
     return ds.imgs, ds.labels.squeeze().astype(np.int64)
 

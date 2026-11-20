@@ -1,0 +1,57 @@
+{
+  "name": "finetune_clahe_weights",
+  "config": {
+    "name": "finetune_clahe_weights",
+    "mode": "finetune",
+    "preprocess": "clahe",
+    "class_weights": "balanced",
+    "augment": "none",
+    "epochs": 25,
+    "batch_size": 128,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "patience": 7,
+    "seed": 42,
+    "data_root": "data",
+    "device": "cpu"
+  },
+  "transfer": {
+    "mode": "finetune",
+    "w2_checkpoint": "C:\\Users\\jhoja\\Documents\\Universidad\\Semestre 10\\Machine-Learning\\MachineLearning\\Workshop_2\\checkpoints\\model_best.pt",
+    "loaded": true,
+    "source_model": "smallcnn",
+    "source_classes": [
+      "T-shirt/top",
+      "Trouser",
+      "Pullover",
+      "Dress",
+      "Coat",
+      "Sandal",
+      "Shirt",
+      "Sneaker",
+      "Bag",
+      "Ankle boot"
+    ],
+    "transferred_layers": 30,
+    "reinitialized": [
+      "classifier.2.weight",
+      "classifier.2.bias"
+    ],
+    "trainable_params": 139297,
+    "frozen_params": 0
+  },
+  "normalization": {
+    "mean": 0.5852165818214417,
+    "std": 0.21723265945911407,
+    "preprocess": "clahe"
+  },
+  "class_counts": {
+    "normal": 1214,
+    "pneumonia": 3494
+  },
+  "best_val_auc": 0.9946,
+  "best_epoch": 8,
+  "epochs_run": 15,
+  "train_seconds": 84.1,
+  "checkpoint": "checkpoints\\finetune_clahe_weights_best.pt"
+}

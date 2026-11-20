@@ -96,18 +96,19 @@
     }
   ],
   "youden": {
-    "threshold": 0.9947,
-    "TP": 361,
-    "FP": 26,
-    "TN": 208,
-    "FN": 29,
-    "sensitivity": 0.9256,
-    "specificity": 0.8889,
-    "ppv": 0.9328,
-    "npv": 0.8776,
-    "accuracy": 0.9119,
-    "balanced_accuracy": 0.9073
+    "threshold": 0.8894,
+    "TP": 385,
+    "FP": 63,
+    "TN": 171,
+    "FN": 5,
+    "sensitivity": 0.9872,
+    "specificity": 0.7308,
+    "ppv": 0.8594,
+    "npv": 0.9716,
+    "accuracy": 0.891,
+    "balanced_accuracy": 0.859
   },
+  "youden_selected_on": "val",
   "name": "finetune_clahe",
   "checkpoint": "checkpoints\\finetune_clahe_best.pt",
   "config": {
